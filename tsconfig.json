@@ -12,7 +12,6 @@
         "outDir": "./",
         "stripInternal": true,
         "types": [
-            "jasmine",
             "node"
         ],
         "typeRoots": [
@@ -26,6 +25,6 @@
     ],
     "files": [
       "src/index.ts",
-       "src/common.ts"
+      "src/common.ts"
     ]
 }
