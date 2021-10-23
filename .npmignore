@@ -1,5 +1,13 @@
+# dev
+.vscode
+.theia
+.idea
+.devcontainer
 .DS_Store
 node_modules
+
+# github
+.github
 
 # test
 src/test
@@ -13,3 +21,6 @@ rollup.config.js
 # typescript
 tsconfig.json
 tsconfig.spec.json
+
+# tslint
+tslint.json
