@@ -1,18 +1,8 @@
-/**
- * @license
- * MOST Web Framework 2.0 Codename Blueshift
- * Copyright (c) 2017, THEMOST LP All rights reserved
- *
- * Use of this source code is governed by an BSD-3-Clause license that can be
- * found in the LICENSE file at https://themost.io/license
- */
+// MOST Web Framework 2.0 Copyright (c) 2017-2021, THEMOST LP All rights reserved
 
 import {ClientDataServiceBase, ClientDataContextBase, TextUtils, DataServiceQueryParams, DataServiceExecuteOptions, Args,
     ClientDataContextOptions} from './common';
-// a workaround of calling parse namespace -exported by url-parse- in typescript
-import * as parse_ from 'url-parse';
 import {EdmSchema} from './metadata';
-const parse = parse_;
 class ClientQueryExpression {
     public left: any;
     public op: string;
@@ -30,14 +20,14 @@ export interface ListResponse<T> {
 export class ClientDataQueryable {
 
     public static parse(u: string, service?: ClientDataServiceBase): ClientDataQueryable {
-        const uri = parse(u);
+        const uri = new URL(u);
         const result = new ClientDataQueryable('Model', service || new ParserDataService(uri.protocol ? uri.origin : '/'));
-        for (const key in uri.query) {
+        for (const key in uri.searchParams) {
             if (/^\$/.test(key)) {
-                if (/[+-]?\d+/.test(uri.query[key])) {
-                    result.setParam(key, parseInt(uri.query[key], 10));
+                if (/[+-]?\d+/.test(uri.searchParams[key])) {
+                    result.setParam(key, parseInt(uri.searchParams[key], 10));
                 } else {
-                    result.setParam(key, uri.query[key]);
+                    result.setParam(key, uri.searchParams[key]);
                 }
             }
         }

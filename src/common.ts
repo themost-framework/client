@@ -1,3 +1,4 @@
+// MOST Web Framework 2.0 Copyright (c) 2017-2021, THEMOST LP All rights reserved
 import {EdmSchema} from './metadata';
 
 export class CodedError extends Error {
