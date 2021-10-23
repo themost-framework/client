@@ -2,7 +2,7 @@
   "name": "@themost/client",
   "version": "2.5.5",
   "description": "MOST Web Framework 2.0 - Client Common Module",
-  "module": "dist/themost-client.js",
+  "module": "dist/themost-client.esm.js",
   "main": "dist/themost-client.js",
   "types": "dist/index.d.ts",
   "scripts": {
