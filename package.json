@@ -9,7 +9,7 @@
     "build": "rimraf dist && rollup -c ./rollup.config.js -m",
     "watch": "rimraf dist && rollup -c ./rollup.config.js -m -w",
     "prepublishOnly": "npm run build",
-    "test": "karma",
+    "test": "karma start",
     "tslint": "tslint --project ."
   },
   "peerDependencies": {},
@@ -29,6 +29,7 @@
   "devDependencies": {
     "@types/jasmine": "^3.10.0",
     "@types/node": "^16.11.4",
+    "ansi-regex": "^5.0.1",
     "core-js": "^2.6.12",
     "jasmine": "^3.10.0",
     "karma": "^6.3.5",

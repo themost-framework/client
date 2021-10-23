@@ -20,17 +20,21 @@ export interface ListResponse<T> {
 export class ClientDataQueryable {
 
     public static parse(u: string, service?: ClientDataServiceBase): ClientDataQueryable {
-        const uri = new URL(u);
-        const result = new ClientDataQueryable('Model', service || new ParserDataService(uri.protocol ? uri.origin : '/'));
-        for (const key in uri.searchParams) {
-            if (/^\$/.test(key)) {
-                if (/[+-]?\d+/.test(uri.searchParams[key])) {
-                    result.setParam(key, parseInt(uri.searchParams[key], 10));
-                } else {
-                    result.setParam(key, uri.searchParams[key]);
-                }
-            }
+        let uri: URL;
+        if (TextUtils.isAbsoluteURI(u)) {
+            uri = new URL(u);
+        } else {
+            const base = service && service.getBase();
+            uri = new URL(u, base || 'http://0.0.0.0');
         }
+        const result = new ClientDataQueryable('Model', service || new ParserDataService(uri.protocol ? uri.origin : '/'));
+        uri.searchParams.forEach((value, key) => {
+            if (/[+-]?\d+/.test(value)) {
+                result.setParam(key, parseInt(value, 10));
+            } else {
+                result.setParam(key, value);
+            }
+        });
         result.setUrl(uri.pathname);
         return result;
     }
