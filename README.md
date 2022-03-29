@@ -8,11 +8,9 @@
 
 # @themost/client
 
-![MOST Web Framework Logo](https://www.themost.io/assets/images/most_logo_sw_240.png)
+![MOST Web Framework Logo](https://github.com/themost-framework/common/raw/master/docs/img/themost_framework_v3_128.png)
 
-[MOST Web Framework **Codename Blueshift**](https://github.com/themost-framework/themost) core javascript client
-
-@themost/client is being used by several javascript clients
+[MOST Web Framework](https://github.com/themost-framework/themost) core module for javascript clients.
 
 #### Node Client Module
 
