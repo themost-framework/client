@@ -11,7 +11,7 @@ declare interface FiredListener {
  */
 function wrapAsyncListener(asyncListener: (...arg: any) => Promise<void>) {
     /**
-     * @this AsyncSeriesEventEmitter
+     * @this SequentialEventEmitter
      */
     const result = function() {
         // get arguments without callback
@@ -35,7 +35,7 @@ function wrapAsyncListener(asyncListener: (...arg: any) => Promise<void>) {
 
 function wrapOnceListener(listener: (...arg: any[]) => void) {
     /**
-     * @this AsyncSeriesEventEmitter
+     * @this SequentialEventEmitter
      */
     const result = function() {
         // get arguments without callback
@@ -66,7 +66,7 @@ function wrapOnceListener(listener: (...arg: any[]) => void) {
  */
 function wrapOnceAsyncListener(event: string | symbol, asyncListener: (...arg: any) => Promise<void>) {
     /**
-     * @this AsyncSeriesEventEmitter
+     * @this SequentialEventEmitter
      */
     const result = function() {
         // tslint:disable-next-line:no-arg
@@ -97,9 +97,9 @@ function wrapOnceAsyncListener(event: string | symbol, asyncListener: (...arg: a
 
 // noinspection JSClosureCompilerSyntax,JSClosureCompilerSyntax,JSClosureCompilerSyntax,JSClosureCompilerSyntax
 /**
- * AsyncEventEmitter class is an extension of node.js EventEmitter class where listeners are executing in series.
+ * SequentialEventEmitter class is an extension of node.js EventEmitter class where listeners are executing in series.
  */
-class AsyncSeriesEventEmitter extends EventEmitter {
+class SequentialEventEmitter extends EventEmitter {
     constructor() {
         super();
     }
@@ -218,6 +218,34 @@ class AsyncSeriesEventEmitter extends EventEmitter {
     }
     once(event: string | symbol, listener: (...args: any[]) => void): this {
         return this.on(event, wrapOnceListener(listener));
+    }
+}
+
+class AsyncSeriesEventEmitter<T> {
+
+    private readonly emitter = new SequentialEventEmitter();
+
+    emit(value?: T): Promise<void> {
+        return new Promise((resolve, reject) => {
+            return this.emitter.emit('async.event', value, (err) => {
+                if (err) {
+                    return reject(err);
+                }
+                return resolve();
+            });
+        });
+    }
+
+    subscribe(next: (value: T) => Promise<void>): void {
+        this.emitter.subscribe('async.event', (...args: any) => {
+            return next.apply(null, args);
+        });
+    }
+
+    subscribeOnce(next: (value: T) => Promise<void>): void {
+        this.emitter.subscribeOnce('async.event', (...args: any) => {
+            return next.apply(null, args);
+        });
     }
 }
 
