@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/themost-framework/themost-client#readme",
   "dependencies": {
-    "@themost/xml": "^2.5.1"
+    "@themost/xml": "^2.5.1",
+    "async": "^2.6.4",
+    "events": "^3.2.0"
   },
   "devDependencies": {
     "@types/jasmine": "^3.10.0",

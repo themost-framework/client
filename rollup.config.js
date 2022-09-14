@@ -22,7 +22,9 @@ module.exports = [{
     ],
     external: [
         'url-parse',
-        '@themost/xml'
+        '@themost/xml',
+        'async',
+        'events'
     ],
     plugins: [
         typescript({
