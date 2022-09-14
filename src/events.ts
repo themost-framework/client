@@ -247,8 +247,83 @@ class AsyncSeriesEventEmitter<T> {
             return next.apply(null, args);
         });
     }
+
+    unsubscribe(asyncListener: (...args: any[]) => Promise<void>): void {
+        this.emitter.unsubscribe('async.event', asyncListener);
+        return;
+    }
+}
+
+function wrapSyncListener<T>(syncListener: (arg: T) => void): (arg: T) => void {
+    /**
+     * @this SequentialEventEmitter
+     */
+        // tslint:disable-next-line:only-arrow-functions
+    const result = function() {
+        syncListener.apply(null, Array.from(arguments));
+    }
+    // set async listener property in order to have an option to unsubscribe
+    Object.defineProperty(result, '_listener', {
+        configurable: true,
+        enumerable: true,
+        value: syncListener
+    });
+    return result;
+}
+
+function wrapOnceSyncListener<T>(syncListener: (arg: T) => void): (arg: T) => void {
+    /**
+     * @this SequentialEventEmitter
+     */
+        // tslint:disable-next-line:only-arrow-functions
+    const result = function() {
+        syncListener.apply(null, Array.from(arguments));
+        Object.assign(syncListener, {
+            fired: true
+        });
+    }
+    // set async listener property in order to have an option to unsubscribe
+    Object.defineProperty(result, '_listener', {
+        configurable: true,
+        enumerable: true,
+        value: syncListener
+    });
+    return result;
+}
+
+class SeriesEventEmitter<T> {
+
+    private readonly listeners: ((value: T) => void)[] = [];
+
+    emit(value?: T): void {
+        for (const syncListener of this.listeners) {
+            const listener = syncListener as any;
+            if (!listener.fired) {
+                listener(value);
+            }
+        }
+    }
+
+    subscribe(next: (value: T) => void): void {
+        this.listeners.push(wrapSyncListener(next));
+    }
+
+    subscribeOnce(next: (value: T) => void): void {
+        this.listeners.push(wrapOnceSyncListener(next));
+    }
+
+    unsubscribe(listener: (value: T) => void): void {
+        for (let i = 0; i < this.listeners.length; i++) {
+            const syncListener = this.listeners[i] as any;
+            if (syncListener._listener === listener) {
+                this.listeners.splice(i , 1);
+                break;
+            }
+        }
+    }
 }
 
 export {
-    AsyncSeriesEventEmitter
+    AsyncSeriesEventEmitter,
+    SeriesEventEmitter
 }
