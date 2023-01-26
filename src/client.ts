@@ -759,6 +759,15 @@ export class ClientDataModel {
         });
     }
 
+    public execute(obj: any): Promise<any> {
+        return this.getService().execute({
+            method: 'POST',
+            url: this.getUrl(),
+            data: obj,
+            headers: {}
+        });
+    }
+
     public schema(): Promise<any> {
         return this.getService().execute({ method: 'GET',
             url: TextUtils.format('%s/schema.json', this.getName()),
