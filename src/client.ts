@@ -3,6 +3,8 @@
 import {ClientDataServiceBase, ClientDataContextBase, TextUtils, DataServiceQueryParams, DataServiceExecuteOptions, Args,
     ClientDataContextOptions} from './common';
 import {EdmSchema} from './metadata';
+import { OpenDataQuery, OpenDataQueryFormatter } from '@themost/query'
+import {SyncSeriesEventEmitter} from '@themost/events';
 class ClientQueryExpression {
     public left: any;
     public op: string;
@@ -50,6 +52,11 @@ export class ClientDataQueryable {
     private $prepare: string;
     private _privates: ClientQueryExpression;
 
+    public readonly resolvingMember = new SyncSeriesEventEmitter<{ target: ClientDataQueryable, member: string }>();
+    public readonly resolvingJoinMember = new SyncSeriesEventEmitter<{ target: ClientDataQueryable, member: string, fullyQualifiedMember?: string }>();
+    public readonly resolvingMethod = new SyncSeriesEventEmitter<{ target: ClientDataQueryable, method: string }>();
+
+
     constructor(model: string, service: ClientDataServiceBase) {
         Args.notEmpty(model, 'Model');
         this._model = model;
@@ -64,6 +71,8 @@ export class ClientDataQueryable {
         this._params = { };
         // init privates
         this._privates = new ClientQueryExpression();
+        // add where expression event
+
     }
 
 
@@ -192,9 +201,46 @@ export class ClientDataQueryable {
         return this;
     }
 
-    public where(name: string): ClientDataQueryable {
-        Args.notEmpty(name, 'Left operand');
-        this._privates.left = name;
+    private getOpenDataQuery() {
+        const q = new OpenDataQuery().from('Thing');
+        q.resolvingMember.subscribe((event) => {
+            const newEvent = {
+                target: this,
+                member: event.member
+            }
+            this.resolvingMember.emit(newEvent);
+            event.member = newEvent.member;
+        });
+        q.resolvingJoinMember.subscribe((event) => {
+            const newEvent = {
+                target: this,
+                member: event.member,
+                fullyQualifiedMember: event.fullyQualifiedMember
+            }
+            this.resolvingJoinMember.emit(newEvent);
+            event.member = newEvent.member;
+            event.fullyQualifiedMember = newEvent.fullyQualifiedMember;
+        });
+        q.resolvingMethod.subscribe((event) => {
+            const newEvent = {
+                target: this,
+                method: event.method
+            }
+            this.resolvingMethod.emit(newEvent);
+            event.method = newEvent.method;
+        });
+        return q;
+    }
+
+    public where<T>(expr: string | ((value: T, ...param: any) => any), params?: any): ClientDataQueryable {
+        if (typeof expr === 'function') {
+            const q = this.getOpenDataQuery().where(expr, params);
+            const queryParams = new OpenDataQueryFormatter().format(q);
+            this.setParam('$filter', queryParams.$filter);
+            return this;
+        }
+        Args.notEmpty(expr, 'Left operand');
+        this._privates.left = expr;
         return this;
     }
 
@@ -386,66 +432,131 @@ export class ClientDataQueryable {
         return this;
     }
 
-    public select(...attr: string[]): ClientDataQueryable {
-        Args.notNull(attr, 'Attributes');
-        Args.check(attr.length > 0, 'Attributes may not be empty');
+    public select<T>(...args: [...expr:[string | ((value: T) => any)], params?: any]): ClientDataQueryable {
+        if (typeof args[0] === 'function') {
+            const q = this.getOpenDataQuery();
+            q.select.apply(q, Array.from(arguments));
+            const queryParams = new OpenDataQueryFormatter().format(q);
+            this._params.$select = queryParams.$select;
+            return this;
+        }
+        Args.notNull(args, 'Attributes');
+        Args.check(args.length > 0, 'Attributes may not be empty');
         const arr = [];
         // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < attr.length; i++) {
-            Args.check(typeof attr[i] === 'string', 'Invalid attribute. Expected string.');
-            arr.push(attr[i]);
+        for (let i = 0; i < args.length; i++) {
+            Args.check(typeof args[i] === 'string', 'Invalid attribute. Expected string.');
+            arr.push(args[i]);
         }
         this._params.$select = arr.join(',');
         return this;
     }
 
-    public groupBy(...attr: string[]): ClientDataQueryable {
-        Args.notNull(attr, 'Attributes');
-        Args.check(attr.length > 0, 'Attributes may not be empty');
+    public groupBy<T>(...args: [...expr:[string | ((value: T) => any)], params?: any]): ClientDataQueryable {
+        if (typeof args[0] === 'function') {
+            const q = this.getOpenDataQuery();
+            q.groupBy.apply(q, Array.from(arguments));
+            const queryParams = new OpenDataQueryFormatter().format(q);
+            this._params.$groupby = queryParams.$groupby;
+            return this;
+        }
+        Args.notNull(args, 'Attributes');
+        Args.check(args.length > 0, 'Attributes may not be empty');
         const arr = [];
         // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < attr.length; i++) {
-            Args.check(typeof attr[i] === 'string', 'Invalid attribute. Expected string.');
-            arr.push(attr[i]);
+        for (let i = 0; i < args.length; i++) {
+            Args.check(typeof args[i] === 'string', 'Invalid attribute. Expected string.');
+            arr.push(args[i]);
         }
         this._params.$groupby = arr.join(',');
         return this;
     }
 
-    public expand(...attr: string[]): ClientDataQueryable {
-        Args.notNull(attr, 'Attributes');
-        Args.check(attr.length > 0, 'Attributes may not be empty');
+    public expand<T>(...args: [...expr:[string | ((value: T) => any)], params?: any]): ClientDataQueryable {
+        Args.notNull(args, 'Attributes');
+        Args.check(args.length > 0, 'Attributes may not be empty');
         const arr = [];
+        if (typeof args[0] === 'function') {
+            let params = null;
+            if (typeof args[args.length - 1] !== 'function') {
+                params = args.pop();
+            }
+            for (const arg of args) {
+                const q = this.getOpenDataQuery();
+                q.select.call(q, arg, params);
+                const queryParams = new OpenDataQueryFormatter().format(q);
+                arr.push(queryParams.$select);
+            }
+            this._params.$expand = arr.join(',');
+            return this;
+        }
+
         // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < attr.length; i++) {
-            Args.check(typeof attr[i] === 'string', 'Invalid attribute. Expected string.');
-            arr.push(attr[i]);
+        for (let i = 0; i < args.length; i++) {
+            Args.check(typeof args[i] === 'string', 'Invalid attribute. Expected string.');
+            arr.push(args[i]);
         }
         this._params.$expand = arr.join(',');
         return this;
     }
 
-    public orderBy(attr: string): ClientDataQueryable {
-        Args.notEmpty(attr, 'Order by attribute');
-        this._params.$orderby = attr.toString();
+    public orderBy<T>(expr: string | ((value: T, ...param: any) => any), params?: any): ClientDataQueryable {
+        if (typeof expr === 'function') {
+            const q = this.getOpenDataQuery();
+            q.orderBy.apply(q, Array.from(arguments));
+            const queryParams = new OpenDataQueryFormatter().format(q);
+            this._params.$orderby = queryParams.$orderby;
+            return this;
+        }
+        Args.notEmpty(expr, 'Order by attribute');
+        this._params.$orderby = expr.toString();
         return this;
     }
 
-    public thenBy(attr: string): ClientDataQueryable {
-        Args.notEmpty(attr, 'Order by attribute');
-        this._params.$orderby += (this._params.$orderby ? ',' + attr.toString() : attr.toString());
+    public thenBy<T>(expr: string | ((value: T, ...param: any) => any), params?: any): ClientDataQueryable {
+        if (typeof expr === 'function') {
+            const q = this.getOpenDataQuery();
+            q.thenBy.apply(q, Array.from(arguments));
+            const queryParams = new OpenDataQueryFormatter().format(q);
+            if (this._params.$orderby) {
+                this._params.$orderby += queryParams.$orderby;
+            } else {
+                this._params.$orderby = queryParams.$orderby;
+            }
+            return this;
+        }
+        Args.notEmpty(expr, 'Order by attribute');
+        this._params.$orderby += (this._params.$orderby ? ',' + expr.toString() : expr.toString());
         return this;
     }
 
-    public orderByDescending(attr: string): ClientDataQueryable {
-        Args.notEmpty(attr, 'Order by attribute');
-        this._params.$orderby = attr.toString() + ' desc';
+    public orderByDescending<T>(expr: string | ((value: T, ...param: any) => any), params?: any): ClientDataQueryable {
+        if (typeof expr === 'function') {
+            const q = this.getOpenDataQuery();
+            q.orderByDescending.apply(q, Array.from(arguments));
+            const queryParams = new OpenDataQueryFormatter().format(q);
+            this._params.$orderby = queryParams.$orderby;
+            return this;
+        }
+        Args.notEmpty(expr, 'Order by attribute');
+        this._params.$orderby = expr.toString() + ' desc';
         return this;
     }
 
-    public thenByDescending(attr: string): ClientDataQueryable {
-        Args.notEmpty(attr, 'Order by attribute');
-        this._params.$orderby += (this._params.$orderby ? ',' + attr.toString() : attr.toString()) + ' desc';
+    public thenByDescending<T>(expr: string | ((value: T, ...param: any) => any), params?: any): ClientDataQueryable {
+        if (typeof expr === 'function') {
+            const q = this.getOpenDataQuery();
+            q.thenByDescending.apply(q, Array.from(arguments));
+            const queryParams = new OpenDataQueryFormatter().format(q);
+            if (this._params.$orderby) {
+                this._params.$orderby += queryParams.$orderby;
+            } else {
+                this._params.$orderby = queryParams.$orderby;
+            }
+            return this;
+        }
+        Args.notEmpty(expr, 'Order by attribute');
+        this._params.$orderby += (this._params.$orderby ? ',' + expr.toString() : expr.toString()) + ' desc';
         return this;
     }
 
@@ -905,7 +1016,7 @@ export class ClientDataService implements ClientDataServiceBase {
     public resolve(relative: string) {
         if (typeof relative === 'string' && relative.length > 0) {
             if (/^\//.test(relative)) {
-                return this.getBase() + relative.substr(1);
+                return this.getBase() + relative.substring(1);
             } else {
                 return this.getBase() + relative;
             }

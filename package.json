@@ -12,7 +12,9 @@
     "test": "karma start",
     "tslint": "tslint --project ."
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "@themost/query": "^2.8.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/themost-framework/themost-client.git"
@@ -24,6 +26,7 @@
   },
   "homepage": "https://github.com/themost-framework/themost-client#readme",
   "dependencies": {
+    "@themost/events": "^1.1.0",
     "@themost/xml": "^2.5.1"
   },
   "devDependencies": {
