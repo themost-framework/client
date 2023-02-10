@@ -1,6 +1,6 @@
 {
   "name": "@themost/client",
-  "version": "2.5.6",
+  "version": "2.9.0",
   "description": "MOST Web Framework 2.0 - Client Common Module",
   "module": "dist/index.esm.js",
   "main": "dist/index.js",
