@@ -4,9 +4,7 @@ import {ClientDataQueryable, ClientDataService, ParserDataService} from '../inde
 describe('ClientDataQueryable', () => {
     let service: ClientDataService;
     beforeEach(() => {
-        service = new ParserDataService('/', {
-            useMediaTypeExtensions: false
-        });
+        service = new ParserDataService('/');
     });
     it('should create instance', () => {
         const query = new ClientDataQueryable('people', service);

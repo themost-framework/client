@@ -62,7 +62,8 @@ export class ClientDataQueryable {
         this._model = model;
         Args.notNull(service, 'Data Service');
         this._service = service;
-        if (this._service.getOptions().useMediaTypeExtensions) {
+        const options = this._service.getOptions();
+        if (!!options.useMediaTypeExtensions) {
             this._url = TextUtils.format('%s/index.json', this._model);
         } else {
             this._url = TextUtils.format('%s', this._model);
@@ -958,15 +959,15 @@ export class ClientDataContext implements ClientDataContextBase {
 
     /**
      * Gets an instance of ClientDataModel class
-     * @param name - A string which represents the name of the data model.
+     * @param name {string|*} - A string which represents the name of the data model.
      * @returns {ClientDataModel}
      */
-    public model(name: string): ClientDataModel {
+    public model(name: string | any): ClientDataModel {
         Args.notEmpty(name, 'Model name');
         return new ClientDataModel(name, this.getService());
     }
 
-    public getMetadata(force = false) {
+    public getMetadata(force = false): Promise<EdmSchema> {
         if (this.metadata) {
             if (!force) {
                 return Promise.resolve(this.metadata);
@@ -990,7 +991,7 @@ export class ClientDataService implements ClientDataServiceBase {
     constructor(base: string, options?: ClientDataContextOptions) {
         this._headers = {};
         this._options = options || {
-            useMediaTypeExtensions: true
+            useMediaTypeExtensions: false
         };
         if (typeof base === 'undefined' || base == null) {
             this._base = '/';
