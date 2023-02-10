@@ -116,11 +116,11 @@ export class Base64 {
 
 export class TextUtils {
 
-    public static isNotEmptyString(s: string): boolean {
-        return (s != null) && (s.length > 0);
+    public static isNotEmptyString(s: any): boolean {
+        return typeof s === 'string' && s.length > 0;
     }
 
-    public static isNullOrUndefined(s: string): boolean {
+    public static isNullOrUndefined(s: any): boolean {
         return (s == null);
     }
 
@@ -139,9 +139,12 @@ export class TextUtils {
         return res;
     }
 
-    public static isDate(s: string): boolean {
+    public static isDate(s: any): boolean {
         if (typeof s === 'string') {
             return TextUtils.REG_DATETIME_ISO.test(s);
+        }
+        if (s instanceof Date) {
+            return true;
         }
         return false;
     }
@@ -420,4 +423,18 @@ export interface ClientDataContextBase {
      * Gets the instance of ClientDataServiceBase class which is associated with this data context
      */
     getService(): ClientDataServiceBase;
+
+    get service(): ClientDataServiceBase; 
+}
+
+export function configurable(value: boolean) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        descriptor.configurable = value;
+    };
+}
+
+export function enumerable(value: boolean) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        descriptor.enumerable = value;
+    };
 }

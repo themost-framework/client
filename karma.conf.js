@@ -21,7 +21,8 @@ module.exports = function(config) {
       "**/*.ts": "karma-typescript" // *.tsx for React Jsx
     },
     karmaTypescriptConfig: {
-      tsconfig: "../tsconfig.spec.json"
+      tsconfig: "../tsconfig.spec.json",
+      sourceMap: true
     },
     customLaunchers: {
       ChromeHeadlessNoSandbox: {

@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-        "target": "es5",
-        "module": "es2015",
+        "target": "ES2015",
+        "module": "ES2015",
         "moduleResolution": "node",
         "sourceMap": true,
         "emitDecoratorMetadata": true,
@@ -11,6 +11,11 @@
         "declaration": true,
         "outDir": "./",
         "stripInternal": true,
+        "paths": {
+            "@themost/query": [
+                "../../modules/query/src/index"
+            ]
+        },
         "types": [
             "node"
         ],

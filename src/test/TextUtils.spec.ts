@@ -51,8 +51,12 @@ describe('TextUtils', () => {
     });
     it('execute TextUtils.escape(Date)', () => {
         // get timezone from string
-        let timezone = new Date(2001, 0, 20).toString().match(/([-+][0-9]+)\s/)[1];
-        timezone = timezone.substr(0, timezone.length - 2) + ':' + timezone.substr(timezone.length - 2, 2);
+        const match = new Date(2001, 0, 20).toString().match(/([-+][0-9]+)\s/);
+        let timezone = match && match[1];
+        expect(timezone).toBeTruthy();
+        if (timezone) {
+            timezone = timezone.substring(0, timezone.length - 2) + ':' + timezone.substring(timezone.length - 2, timezone.length);
+        }
         // validate date
         expect(TextUtils.escape(new Date(2001, 0, 20))).toBe(`'2001-01-20 00:00:00.000${timezone}'`);
     });

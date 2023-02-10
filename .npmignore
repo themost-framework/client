@@ -11,6 +11,7 @@ node_modules
 
 # test
 src/test
+spec
 
 # karma
 karma.conf.js
