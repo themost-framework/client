@@ -23,3 +23,7 @@
 #### React Client Module
 
 [@themost/react](https://github.com/themost-framework/react) is a client module for react applications which are going to use MOST Web Framework as backend api server.
+
+#### JQuery Client Module
+
+[@themost/jquery](https://github.com/themost-framework/jquery) is a client module for JQuery scripts and applications which are going to use MOST Web Framework as backend api server.
