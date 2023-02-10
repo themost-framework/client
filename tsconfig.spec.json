@@ -26,9 +26,6 @@
     "exclude": [
         "node_modules"
     ],
-    "files": [
-        "src/test.ts"
-    ],
     "include": [
         "**/*.ts",
         "**/*.spec.ts",

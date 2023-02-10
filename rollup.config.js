@@ -1,7 +1,7 @@
 const typescript = require('rollup-plugin-typescript2');
-const commonjs = require('rollup-plugin-commonjs');
 const dist = './dist/';
-const name = 'themost-client';
+const name = 'index';
+const pkg = require('./package.json');
 
 module.exports = [{
     input: './src/index.ts',
@@ -20,14 +20,10 @@ module.exports = [{
             format: 'umd'
         },
     ],
-    external: [
-        'url-parse',
-        '@themost/xml'
-    ],
+    external: Object.keys(pkg.dependencies),
     plugins: [
         typescript({
             declaration: false
-        }),
-        commonjs()
+        })
     ]
 }];

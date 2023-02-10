@@ -116,11 +116,11 @@ export class Base64 {
 
 export class TextUtils {
 
-    public static isNotEmptyString(s: string): boolean {
-        return (s != null) && (s.length > 0);
+    public static isNotEmptyString(s: any): boolean {
+        return typeof s === 'string' && s.length > 0;
     }
 
-    public static isNullOrUndefined(s: string): boolean {
+    public static isNullOrUndefined(s: any): boolean {
         return (s == null);
     }
 
@@ -139,9 +139,12 @@ export class TextUtils {
         return res;
     }
 
-    public static isDate(s: string): boolean {
+    public static isDate(s: any): boolean {
         if (typeof s === 'string') {
             return TextUtils.REG_DATETIME_ISO.test(s);
+        }
+        if (s instanceof Date) {
+            return true;
         }
         return false;
     }

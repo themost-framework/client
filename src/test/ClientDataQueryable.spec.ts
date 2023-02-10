@@ -1,3 +1,4 @@
+import { count } from '@themost/query';
 import {ClientDataQueryable, ClientDataService, ParserDataService} from '../index';
 
 describe('ClientDataQueryable', () => {
@@ -17,7 +18,7 @@ describe('ClientDataQueryable', () => {
     });
     it('should use getService()', () => {
         const query = new ClientDataQueryable('people', service);
-        expect(query.getService() instanceof ClientDataService).toBeTruthy('Expected ClientDataService');
+        expect(query.getService() instanceof ClientDataService).toBeTruthy();
     });
     it('should use getParams()', () => {
         const query = new ClientDataQueryable('people', service)
@@ -47,7 +48,7 @@ describe('ClientDataQueryable', () => {
     it('should use where()', () => {
         const query = new ClientDataQueryable('people', service);
         expect(query
-            .where('email').equal('alexis.rees@example.com')
+            .where((x: any) => x.email === 'alexis.rees@example.com')
             .toString()).toBe('/people?$filter=email eq \'alexis.rees@example.com\'');
     });
     it('should use and()', () => {
@@ -62,36 +63,38 @@ describe('ClientDataQueryable', () => {
     it('should use or()', () => {
         const query = new ClientDataQueryable('orders', service);
         expect(query
-            .where('orderStatus/alternateName').equal('OrderStatusDelivered')
-            .or('orderStatus/alternateName').equal('OrderStatusCancelled')
+            .where((x: any) => {
+                return x.orderStatus.alternateName === 'OrderStatusDelivered' ||
+                    x.orderStatus.alternateName === 'OrderStatusCancelled'
+            })
             .toString())
-            .toBe('/orders?$filter=orderStatus/alternateName eq \'OrderStatusDelivered\' ' +
-                'or orderStatus/alternateName eq \'OrderStatusCancelled\'');
+            .toBe('/orders?$filter=(orderStatus/alternateName eq \'OrderStatusDelivered\' ' +
+                'or orderStatus/alternateName eq \'OrderStatusCancelled\')');
     });
     it('should use orderBy()', () => {
         const query = new ClientDataQueryable('people', service);
         expect(query
-            .orderBy('familyName')
+            .orderBy((x:any) => x.familyName)
             .toString()).toBe('/people?$orderby=familyName');
     });
     it('should use thenBy()', () => {
         const query = new ClientDataQueryable('people', service);
         expect(query
-            .orderBy('familyName')
-            .thenBy('givenName')
+            .orderBy((x:any) => x.familyName)
+            .thenBy((x:any) => x.givenName)
             .toString()).toBe('/people?$orderby=familyName,givenName');
     });
     it('should use orderByDescending()', () => {
         const query = new ClientDataQueryable('people', service);
         expect(query
-            .orderByDescending('familyName')
+            .orderByDescending((x:any) => x.familyName)
             .toString()).toBe('/people?$orderby=familyName desc');
     });
     it('should use thenByDescending()', () => {
         const query = new ClientDataQueryable('people', service);
         expect(query
-            .orderBy('familyName')
-            .thenByDescending('givenName')
+            .orderBy((x:any) => x.familyName)
+            .thenByDescending((x:any) => x.givenName)
             .toString()).toBe('/people?$orderby=familyName,givenName desc');
     });
     it('should use expand()', () => {
@@ -103,14 +106,23 @@ describe('ClientDataQueryable', () => {
     it('should use select()', () => {
         const query = new ClientDataQueryable('people', service);
         expect(query
-            .select('id', 'familyName', 'givenName')
-            .toString()).toBe('/people?$select=id,familyName,givenName');
+            .select(({id, familyName, givenName}) => {
+                return {
+                    id,
+                    familyName,
+                    givenName
+                }
+        }).toString()).toBe('/people?$select=id,familyName,givenName');
     });
     it('should use orderBy()', () => {
         const query = new ClientDataQueryable('orders', service);
         expect(query
-            .select('count(id) as total', 'orderStatus')
-            .groupBy('orderStatus')
+            .select(({id, orderStatus}) => {
+                return {
+                    total: count(id),
+                    orderStatus
+                }
+            }).groupBy((x:any) => x.orderStatus)
             .toString()).toBe('/orders?$select=count(id) as total,orderStatus&$groupby=orderStatus');
     });
     it('should use take()', () => {
