@@ -17,14 +17,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/themost-framework/themost-client.git"
+    "url": "git+https://github.com/themost-framework/client.git"
   },
   "author": "THEMOST LP <support@.themost.io>",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/themost-framework/themost-client/issues"
+    "url": "https://github.com/themost-framework/client/issues"
   },
-  "homepage": "https://github.com/themost-framework/themost-client#readme",
+  "homepage": "https://github.com/themost-framework/client#readme",
   "dependencies": {
     "@themost/events": "^1.1.0",
     "@themost/query": "^2.9.5",
