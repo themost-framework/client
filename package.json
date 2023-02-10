@@ -1,7 +1,7 @@
 {
   "name": "@themost/client",
   "version": "2.9.0",
-  "description": "MOST Web Framework 2.0 - Client Common Module",
+  "description": "MOST Web Framework Codename Blueshift - Client Common",
   "module": "dist/index.esm.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,6 @@
     "tslint": "tslint --project ."
   },
   "peerDependencies": {
-    "@themost/query": "^2.8.0"
   },
   "repository": {
     "type": "git",

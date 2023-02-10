@@ -134,8 +134,8 @@ describe('Closures', () => {
 
     it('should use expand with nested expand', () => {
         const emailAddress = 'alexis.rees@example.com';
-        const query = context.model('People')
-        .where(({email}) => {
+        const People = context.model('People'); 
+        const query = People.where(({email}) => {
             return email === emailAddress;
         }, {
             emailAddress

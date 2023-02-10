@@ -1,10 +1,17 @@
 // MOST Web Framework 2.0 Copyright (c) 2017-2021, THEMOST LP All rights reserved
 
 import {ClientDataServiceBase, ClientDataContextBase, TextUtils, DataServiceQueryParams, DataServiceExecuteOptions, Args,
-    ClientDataContextOptions} from './common';
+    ClientDataContextOptions,
+    configurable,
+    enumerable} from './common';
 import {EdmSchema} from './metadata';
 import { OpenDataQuery, OpenDataQueryFormatter } from '@themost/query'
 import {SyncSeriesEventEmitter} from '@themost/events';
+
+interface ServiceContainer {
+    _service?: ClientDataServiceBase
+}
+
 class ClientQueryExpression {
     public left: any;
     public op: string;
@@ -47,7 +54,6 @@ export class ClientDataQueryable {
 
     private readonly _model: string;
     private _url: string;
-    private readonly _service: ClientDataServiceBase;
     private readonly _params: any;
     private $prepare: string;
     private _privates: ClientQueryExpression;
@@ -61,8 +67,13 @@ export class ClientDataQueryable {
         Args.notEmpty(model, 'Model');
         this._model = model;
         Args.notNull(service, 'Data Service');
-        this._service = service;
-        const options = this._service.getOptions();
+        Object.defineProperty(this, '_service', {
+            configurable: false,
+            enumerable: false,
+            writable: false,
+            value: service
+        })
+        const options = this.service.getOptions();
         if (!!options.useMediaTypeExtensions) {
             this._url = TextUtils.format('%s/index.json', this._model);
         } else {
@@ -73,7 +84,6 @@ export class ClientDataQueryable {
         // init privates
         this._privates = new ClientQueryExpression();
         // add where expression event
-
     }
 
 
@@ -127,7 +137,13 @@ export class ClientDataQueryable {
      * @returns {ClientDataServiceBase}
      */
     public getService(): ClientDataServiceBase {
-        return this._service;
+        return this.service;
+    }
+
+    @configurable(false)
+    @enumerable(false)
+    public get service(): ClientDataServiceBase {
+        return (this as ServiceContainer)._service;
     }
 
     /**
@@ -788,19 +804,27 @@ export class ClientDataQueryable {
 export class ClientDataModel {
 
     private readonly _name: string;
-    private readonly _service: ClientDataServiceBase;
-
+    
     constructor(name: string, service: ClientDataServiceBase) {
         this._name = name;
-        this._service = service;
+        Object.defineProperty(this, '_service', {
+            configurable: false,
+            enumerable: false,
+            value: service
+        });
+    }
 
+    @configurable(false)
+    @enumerable(false)
+    get service(): ClientDataServiceBase {
+        return (this as ServiceContainer)._service;
     }
 
     /**
      * @returns {ClientDataServiceBase}
      */
     public getService(): ClientDataServiceBase {
-        return this._service;
+        return (this as ServiceContainer)._service;
     }
 
     public getName(): string {
@@ -812,7 +836,7 @@ export class ClientDataModel {
      * @returns {ClientDataQueryable}
      */
     public asQueryable(params?: DataServiceQueryParams): ClientDataQueryable {
-        const q =  ClientDataQueryable.create(this.getName(), this._service);
+        const q =  ClientDataQueryable.create(this.getName(), this.service);
         if (params) {
             for (const key in params) {
                 if (params.hasOwnProperty(key)) {
@@ -860,7 +884,7 @@ export class ClientDataModel {
     }
 
     public getUrl() {
-        if (this._service.getOptions().useMediaTypeExtensions) {
+        if (this.service.getOptions().useMediaTypeExtensions) {
             return TextUtils.format('%s/index.json', this.getName());
         } else {
             return TextUtils.format('%s', this.getName());
@@ -915,21 +939,30 @@ export class ClientDataModel {
 export class ClientDataContext implements ClientDataContextBase {
 
     protected metadata: EdmSchema;
-    private readonly _service: ClientDataServiceBase;
     private options: ClientDataContextOptions;
 
     constructor(service: ClientDataServiceBase, options?: ClientDataContextOptions) {
-        this._service = service;
+        Object.defineProperty(this, '_service', {
+            configurable: false,
+            enumerable: false,
+            value: service
+        });
         this.options = options;
     }
 
+    @configurable(false)
+    @enumerable(false)
+    get service(): ClientDataServiceBase {
+        return (this as ServiceContainer)._service;
+    }
+
     public setBasicAuthorization(username: string, password: string): ClientDataContext {
-        this.getService().setHeader('Authorization', 'Basic ' + TextUtils.toBase64(username + ':' + password));
+        this.service.setHeader('Authorization', 'Basic ' + TextUtils.toBase64(username + ':' + password));
         return this;
     }
 
     public setBearerAuthorization(access_token: string): ClientDataContext {
-        this.getService().setHeader('Authorization', 'Bearer ' + access_token);
+        this.service.setHeader('Authorization', 'Bearer ' + access_token);
         return this;
     }
 
@@ -938,14 +971,14 @@ export class ClientDataContext implements ClientDataContextBase {
      * @returns {string}
      */
     public getBase(): string {
-        return this._service.getBase();
+        return this.service.getBase();
     }
 
     /**
      * Sets a string which represents the base URL of the MOST Web Application Server.
      */
     public setBase(value: string): ClientDataContextBase {
-        this._service.setBase(value);
+        this.service.setBase(value);
         return this;
     }
 
@@ -954,7 +987,7 @@ export class ClientDataContext implements ClientDataContextBase {
      * @returns {ClientDataServiceBase}
      */
     public getService(): ClientDataServiceBase {
-        return this._service;
+        return (this as ServiceContainer)._service;
     }
 
     /**
@@ -964,7 +997,7 @@ export class ClientDataContext implements ClientDataContextBase {
      */
     public model(name: string | any): ClientDataModel {
         Args.notEmpty(name, 'Model name');
-        return new ClientDataModel(name, this.getService());
+        return new ClientDataModel(name, this.service);
     }
 
     public getMetadata(force = false): Promise<EdmSchema> {
@@ -973,7 +1006,7 @@ export class ClientDataContext implements ClientDataContextBase {
                 return Promise.resolve(this.metadata);
             }
         }
-        return this.getService().getMetadata().then( (result) => {
+        return this.service.getMetadata().then( (result) => {
             this.metadata = result;
             return Promise.resolve(this.metadata);
         });

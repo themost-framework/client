@@ -423,4 +423,18 @@ export interface ClientDataContextBase {
      * Gets the instance of ClientDataServiceBase class which is associated with this data context
      */
     getService(): ClientDataServiceBase;
+
+    get service(): ClientDataServiceBase; 
+}
+
+export function configurable(value: boolean) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        descriptor.configurable = value;
+    };
+}
+
+export function enumerable(value: boolean) {
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        descriptor.enumerable = value;
+    };
 }
