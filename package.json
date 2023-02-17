@@ -26,7 +26,7 @@
   "homepage": "https://github.com/themost-framework/client#readme",
   "dependencies": {
     "@themost/events": "^1.1.0",
-    "@themost/query": "^2.9.6",
+    "@themost/query": "^2.9.7",
     "@themost/xml": "^2.5.1"
   },
   "devDependencies": {

@@ -424,7 +424,7 @@ export interface ClientDataContextBase {
      */
     getService(): ClientDataServiceBase;
 
-    get service(): ClientDataServiceBase; 
+    readonly service: ClientDataServiceBase;
 }
 
 export function configurable(value: boolean) {
