@@ -5,7 +5,7 @@ import {ClientDataServiceBase, ClientDataContextBase, TextUtils, DataServiceQuer
     configurable,
     enumerable} from './common';
 import {EdmSchema} from './metadata';
-import { OpenDataQuery, OpenDataQueryFormatter } from '@themost/query'
+import { OpenDataQuery, OpenDataQueryFormatter, QueryFunc } from '@themost/query'
 import {SyncSeriesEventEmitter} from '@themost/events';
 
 interface ServiceContainer {
@@ -37,7 +37,7 @@ export class ClientDataQueryable {
             uri = new URL(u, base || 'http://0.0.0.0');
         }
         const result = new ClientDataQueryable('Model', service || new ParserDataService(uri.protocol ? uri.origin : '/'));
-        uri.searchParams.forEach((value, key) => {
+        (uri.searchParams as any).forEach((value: string, key: string) => {
             if (/[+-]?\d+/.test(value)) {
                 result.setParam(key, parseInt(value, 10));
             } else {
@@ -249,9 +249,9 @@ export class ClientDataQueryable {
         return q;
     }
 
-    public where<T>(expr: (string | ((value: T) => any)), params?: any): ClientDataQueryable
-    public where<T>(expr: string): ClientDataQueryable
-    public where<T>(expr: (string | ((value: T) => any)), params?: any): ClientDataQueryable {
+    public where<T>(expr: QueryFunc<T>, params?: any): this;
+    public where<T>(expr: (string | any)): this;
+    public where<T>(expr: (string | QueryFunc<T> | any), params?: any): this {
         if (typeof expr === 'function') {
             const q = this.getOpenDataQuery().where(expr, params);
             const queryParams = new OpenDataQueryFormatter().format(q);
@@ -451,9 +451,9 @@ export class ClientDataQueryable {
         return this;
     }
 
-    public select<T>(...args: [...expr:[ string | ((value: T) => any)], params?: any]): ClientDataQueryable;
-    public select<T>(...args: string[]): ClientDataQueryable;
-    public select<T>(...args: (string | any | ((value: T) => any))[]): ClientDataQueryable {
+    public select<T>(expr: QueryFunc<T>, params?: any): this;
+    public select<T>(...args: (string | any)[]): this;
+    public select<T>(...args: (string | QueryFunc<T> | any)[]): this {
         if (typeof args[0] === 'function') {
             const q = this.getOpenDataQuery();
             q.select.apply(q, Array.from(arguments));
@@ -473,9 +473,19 @@ export class ClientDataQueryable {
         return this;
     }
 
-    public groupBy<T>(...args: [...expr:[string | ((value: T) => any)], params?: any]): ClientDataQueryable;
-    public groupBy<T>(...args: [string]): ClientDataQueryable;
-    public groupBy<T>(...args: [...expr:[string | ((value: T) => any)], params?: any]): ClientDataQueryable {
+    public groupBy<T>(arg1: QueryFunc<T>, params?: any): ClientDataQueryable;
+    public groupBy<T>(arg1: QueryFunc<T>, arg2: QueryFunc<T>, params?: any): ClientDataQueryable;
+    public groupBy<T>(arg1: QueryFunc<T>, arg2: QueryFunc<T>, arg3: QueryFunc<T>, params?: any): ClientDataQueryable;
+    public groupBy<T>(arg1: QueryFunc<T>, arg2: QueryFunc<T>, arg3: QueryFunc<T>,
+               arg4: QueryFunc<T>, params?: any): ClientDataQueryable;
+    public groupBy<T>(arg1: QueryFunc<T>, arg2: QueryFunc<T>, arg3: QueryFunc<T>,
+               arg4: QueryFunc<T>, arg5: QueryFunc<T>, params?: any): ClientDataQueryable;
+    public groupBy<T>(arg1: QueryFunc<T>, arg2: QueryFunc<T>, arg3: QueryFunc<T>,
+               arg4: QueryFunc<T>, arg5: QueryFunc<T>, arg6: QueryFunc<T>, params?: any): ClientDataQueryable;
+    public groupBy<T>(arg1: QueryFunc<T>, arg2: QueryFunc<T>, arg3: QueryFunc<T>,
+               arg4: QueryFunc<T>, arg5: QueryFunc<T>, arg6: QueryFunc<T> , arg7: QueryFunc<T>, params?: any): ClientDataQueryable;
+    public groupBy<T>(...args: (string | any)[]): ClientDataQueryable;
+    public groupBy<T>(...args: (string | any | QueryFunc<T>)[]): ClientDataQueryable {
         if (typeof args[0] === 'function') {
             const q = this.getOpenDataQuery();
             q.groupBy.apply(q, Array.from(arguments));
@@ -495,9 +505,7 @@ export class ClientDataQueryable {
         return this;
     }
 
-    public expand<T>(...args: [...expr:[(value: T) => any], params?: any]): ClientDataQueryable;
-    public expand(...expr: any[]): ClientDataQueryable;
-    public expand<T>(...args: [...expr:[(value: T) => any], params?: any]): ClientDataQueryable {
+    public expand<T>(...args: (string | OpenDataQuery | QueryFunc<T>)[]): this {
         Args.notNull(args, 'Expand arguments');
         Args.check(args.length > 0, 'Expand arguments may not be empty');
         const q = this.getOpenDataQuery();
@@ -507,9 +515,9 @@ export class ClientDataQueryable {
         return this;
     }
 
-    public orderBy<T>(expr: any | ((value: T) => any), params?: any): ClientDataQueryable;
-    public orderBy<T>(expr: any): ClientDataQueryable;
-    public orderBy<T>(expr: any | ((value: T) => any), params?: any): ClientDataQueryable {
+    public orderBy<T>(expr: QueryFunc<T>, params?: any): this;
+    public orderBy<T>(expr: string | any): this;
+    public orderBy<T>(expr: QueryFunc<T> | string | any): this {
         if (typeof expr === 'function') {
             const q = this.getOpenDataQuery();
             q.orderBy.apply(q, Array.from(arguments));
@@ -522,9 +530,9 @@ export class ClientDataQueryable {
         return this;
     }
 
-    public thenBy<T>(expr: any | ((value: T) => any), params?: any): ClientDataQueryable;
-    public thenBy<T>(expr: any): ClientDataQueryable;
-    public thenBy<T>(expr: any | ((value: T) => any), params?: any): ClientDataQueryable {
+    public thenBy<T>(expr: QueryFunc<T>, params?: any): this;
+    public thenBy<T>(expr: string | any): this;
+    public thenBy<T>(expr: QueryFunc<T> | string | any): this {
         if (typeof expr === 'function') {
             const q = this.getOpenDataQuery();
             q.orderBy.apply(q, Array.from(arguments));
@@ -542,9 +550,9 @@ export class ClientDataQueryable {
         return this;
     }
 
-    public orderByDescending<T>(expr: any | ((value: T) => any), params?: any): ClientDataQueryable;
-    public orderByDescending<T>(expr: any): ClientDataQueryable;
-    public orderByDescending<T>(expr: any | ((value: T) => any), params?: any): ClientDataQueryable {
+    public orderByDescending<T>(expr: QueryFunc<T>, params?: any): this;
+    public orderByDescending<T>(expr: string | any): this;
+    public orderByDescending<T>(expr: QueryFunc<T> | string | any): this {
         if (typeof expr === 'function') {
             const q = this.getOpenDataQuery();
             q.orderByDescending.apply(q, Array.from(arguments));
@@ -557,9 +565,9 @@ export class ClientDataQueryable {
         return this;
     }
 
-    public thenByDescending<T>(expr: any | ((value: T) => any), params?: any): ClientDataQueryable;
-    public thenByDescending<T>(expr: any): ClientDataQueryable;
-    public thenByDescending<T>(expr: any | ((value: T) => any), params?: any): ClientDataQueryable {
+    public thenByDescending<T>(expr: QueryFunc<T>, params?: any): this;
+    public thenByDescending<T>(expr: string | any): this;
+    public thenByDescending<T>(expr: QueryFunc<T> | string | any): this {
         if (typeof expr === 'function') {
             const q = this.getOpenDataQuery();
             q.orderByDescending.apply(q, Array.from(arguments));
@@ -804,7 +812,7 @@ export class ClientDataQueryable {
 export class ClientDataModel {
 
     private readonly _name: string;
-    
+
     constructor(name: string, service: ClientDataServiceBase) {
         this._name = name;
         Object.defineProperty(this, '_service', {
@@ -861,16 +869,16 @@ export class ClientDataModel {
         return this.asQueryable().getList();
     }
 
-    public where<T>(expr: (string | ((value: T) => any)), params?: any): ClientDataQueryable
-    public where(expr: string): ClientDataQueryable
-    public where<T>(expr: (string | ((value: T) => any)), params?: any): ClientDataQueryable {
+    public where<T>(expr: QueryFunc<T>, params?: any): ClientDataQueryable
+    public where<T>(expr: (string | any)): ClientDataQueryable
+    public where<T>(expr: (string | QueryFunc<T> | any), params?: any): ClientDataQueryable {
         const q = this.asQueryable();
         return q.where.apply(q, Array.from(arguments));
     }
 
-    public select<T>(...args: [...expr:[ string | ((value: T) => any)], params?: any]): ClientDataQueryable
-    public select(...args: string[]): ClientDataQueryable 
-    public select<T>(...args: [...expr:[ string | ((value: T) => any)], params?: any]): ClientDataQueryable {
+    public select<T>(expr: QueryFunc<T>, params?: any): ClientDataQueryable;
+    public select(...expr: (string | any)[]): ClientDataQueryable;
+    public select<T>(...args: (string | QueryFunc<T> | any)[]): ClientDataQueryable {
         const q = this.asQueryable();
         return q.select.apply(q, Array.from(arguments));
     }

@@ -99,7 +99,7 @@ export class EdmParameter {
 }
 
 /**
- * Represents the return type of an OData action or function
+ * Represents the result of an OData action or function
  */
 export class EdmReturnType {
     public Type: string;
@@ -217,7 +217,7 @@ export class EdmPropertyRef {
 }
 
 /**
- * Represents an entity type of an OData service container
+ * Represents an OData entity type
  */
 export class EdmEntityType {
     public Name: string;

@@ -143,10 +143,7 @@ export class TextUtils {
         if (typeof s === 'string') {
             return TextUtils.REG_DATETIME_ISO.test(s);
         }
-        if (s instanceof Date) {
-            return true;
-        }
-        return false;
+        return s instanceof Date;
     }
 
     public static isDateOnly(s: string): boolean {
@@ -424,16 +421,18 @@ export interface ClientDataContextBase {
      */
     getService(): ClientDataServiceBase;
 
-    get service(): ClientDataServiceBase; 
+    readonly service: ClientDataServiceBase;
 }
 
 export function configurable(value: boolean) {
+    // tslint:disable-next-line:only-arrow-functions
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         descriptor.configurable = value;
     };
 }
 
 export function enumerable(value: boolean) {
+    // tslint:disable-next-line:only-arrow-functions
     return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
         descriptor.enumerable = value;
     };
