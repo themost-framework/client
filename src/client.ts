@@ -5,7 +5,7 @@ import {ClientDataServiceBase, ClientDataContextBase, TextUtils, DataServiceQuer
     configurable,
     enumerable} from './common';
 import {EdmSchema} from './metadata';
-import { OpenDataQuery, OpenDataQueryFormatter, QueryFunc, QueryJoinFunc } from '@themost/query'
+import { OpenDataQuery, OpenDataQueryFormatter, QueryFunc } from '@themost/query'
 import {SyncSeriesEventEmitter} from '@themost/events';
 
 interface ServiceContainer {
@@ -812,7 +812,7 @@ export class ClientDataQueryable {
 export class ClientDataModel {
 
     private readonly _name: string;
-    
+
     constructor(name: string, service: ClientDataServiceBase) {
         this._name = name;
         Object.defineProperty(this, '_service', {
