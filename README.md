@@ -46,6 +46,7 @@ which produces the following OData expression `/Products?$select=name,year(relea
 
 or an equivalent SQL statement for server-side enviroments `SELECT Products.name AS name, YEAR(Products.releaseDate) AS releaseYear, ROUND(Products.price,2) AS price FROM Products WHERE Products.category = 'Laptops'`
 
+
 ## node.js client
 
 ![@themost/node](docs/nodejs.png)
@@ -93,7 +94,6 @@ Define `$select` system query option by using a javascript closure:
         }).orderByDescending((x) => x.orderDate)
         .take(10)
         .getItems();
-    });
 
 > `/Orders?$select=id,customer/description as customer,orderDate,orderedItem/name as product&$filter=paymentMethod/alternateName eq 'DirectDebit'&$orderby=orderDate desc&$top=10`
 
@@ -109,7 +109,6 @@ Define `$filter` system query option by using a javascript closure:
             orderStatus: 'OrderPickup'
         }).take(10)
         .getItems();
-    });
 
 > `/Orders?$filter=orderStatus/alternateName eq 'OrderPickup'&$top=10`
 
@@ -125,7 +124,6 @@ Set `$top` system query option for defining the number of records to be taken
             orderStatus: 'OrderPickup'
         }).take(10)
         .getItems();
-    });
 
 > `/Orders?$filter=orderStatus/alternateName eq 'OrderPickup'&$top=10`
 
@@ -142,7 +140,6 @@ Set `$skip` system query option for defining the number of records to be skipped
         }).take(25)
         .skip(25)
         .getItems();
-    });
 
 > `/Orders?$filter=orderStatus/alternateName eq 'OrderPickup'&$top=25&$skip=25`
 
@@ -154,7 +151,6 @@ Define `$orderby` system query option for sorting records
         .asQueryable()
         .orderBy(({familyName}) => familyName)
         .getItems();
-    });
 
 > `/People?$orderby=familyName`
 
@@ -165,7 +161,6 @@ Define `$orderby` system query option for sorting records
         .orderBy(({familyName}) => familyName)
         .thenBy(({givenName}) => givenName)
         .getItems();
-    });
 
 > `/People?$orderby=familyName,givenName`
 
@@ -175,7 +170,6 @@ Define `$orderby` system query option for sorting records
         .asQueryable()
         .orderByDescending(({familyName}) => familyName)
         .getItems();
-    });
 
 > `/People?$orderby=familyName desc`
 
@@ -186,6 +180,56 @@ Define `$orderby` system query option for sorting records
         .orderByDescending(({familyName}) => familyName)
         .thenByDescending(({givenName}) => givenName)
         .getItems();
-    });
 
 > `/People?$orderby=familyName desc,givenName desc`
+
+
+### groupBy<T>(...arg: [QueryFunc<T>], params?: any)
+
+Define `$groupby` system query option to group records by using javascript closures:
+
+    const results = await context.model('Orders')
+        .asQueryable()
+        .select(({id, orderStatus}) => {
+            return {
+                total: count(id),
+                orderStatus
+            }
+        }).groupBy(({orderStatus}) => orderStatus)
+        .getItems();
+
+> `/Orders?$select=count(id) as total,orderStatus&$groupby=orderStatus`
+
+### expand<T>(...args: (OpenDataQuery | QueryFunc<T>)[])
+
+Define `$expand` system query option for getting nested objects
+
+Read more about `$expand` at http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#_Toc31361039
+
+    const items= await context.model('Orders')
+        .asQueryable()
+        .select(({id, orderStatus, orderDate}) => {
+            return {
+                id,
+                orderStatus,
+                orderDate
+            }
+        }).expand(
+            (x) => x.customer,
+            (x) => x.orderedItem
+        ).getItems();
+
+> `/Orders?$select=id,orderStatus,orderDate&$expand=customer,orderedItem`
+
+or use query expressions for applying nested query options:
+
+    const items= await context.model('People')
+        .asQueryable()
+        .expand(
+            any((x) => x.address)
+            .select(({id, streetAddress, addressLocalilty}) => ({
+                id, streetAddress, addressLocalilty
+            }))
+        ).getItems();
+
+> `/People?$expand=address($select=id,streetAddress,addressLocalilty;$expand=addressCountry)`
