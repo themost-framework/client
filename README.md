@@ -50,22 +50,142 @@ or an equivalent SQL statement for server-side enviroments `SELECT Products.name
 
 ![@themost/node](docs/nodejs.png)
 
-[@themost/node](https://github.com/themost-framework/node) is a client module for node.js applications which are going to use MOST Web Framework as backend api server.
+[@themost/node](https://github.com/themost-framework/node) is a client module for node.js applications which are going to use [@themost-framework](https://github.com/themost-framework) as backend api server.
 
 ## angular client
 
 ![@themost/angular](docs/angular.png)
 
-[@themost/angular](https://github.com/themost-framework/angular) is a client module for angular 2.x+ applications which are going to use MOST Web Framework as backend api server.
+[@themost/angular](https://github.com/themost-framework/angular) is a client module for angular 2.x+ applications which are going to use [@themost-framework](https://github.com/themost-framework) as backend api server.
 
 ## react client
 
 ![@themost/react](docs/react.png)
 
-[@themost/react](https://github.com/themost-framework/react) is a client module for react applications which are going to use MOST Web Framework as backend api server.
+[@themost/react](https://github.com/themost-framework/react) is a client module for react applications which are going to use [@themost-framework](https://github.com/themost-framework) as backend api server.
 
 ## jQuery client
 
 ![@themost/jquery](docs/jquery.png)
 
-[@themost/jquery](https://github.com/themost-framework/jquery) is a client module for JQuery scripts and applications which are going to use MOST Web Framework as backend api server.
+[@themost/jquery](https://github.com/themost-framework/jquery) is a client module for JQuery scripts and applications which are going to use [@themost-framework](https://github.com/themost-framework) as backend api server.
+
+## Usage
+
+use `ClientDataContext` which is being provided by your environment and initialize an instance of `ClientDataQueryable` class.
+
+### select(expr: QueryFunc<T>, params?: any)
+
+Define `$select` system query option by using a javascript closure:
+
+    const items = await context.model('Orders')
+        .asQueryable()
+        .select((x) => {
+            return {
+                id: x.id,
+                customer: x.customer.description,
+                orderDate: x.orderDate,
+                product: x.orderedItem.name
+            }
+        })
+        .where((x) => {
+            return x.paymentMethod.alternateName === 'DirectDebit';
+        }).orderByDescending((x) => x.orderDate)
+        .take(10)
+        .getItems();
+    });
+
+> `/Orders?$select=id,customer/description as customer,orderDate,orderedItem/name as product&$filter=paymentMethod/alternateName eq 'DirectDebit'&$orderby=orderDate desc&$top=10`
+
+### where(expr: QueryFunc<T>, params?: any)
+
+Define `$filter` system query option by using a javascript closure:
+
+    const items = await context.model('Orders')
+        .asQueryable()
+        .where((x, orderStatus) => {
+            return x.orderStatus.alternateName === orderStatus;
+        }, {
+            orderStatus: 'OrderPickup'
+        }).take(10)
+        .getItems();
+    });
+
+> `/Orders?$filter=orderStatus/alternateName eq 'OrderPickup'&$top=10`
+
+### take(n: number)
+
+Set `$top` system query option for defining the number of records to be taken
+
+    const items = await context.model('Orders')
+        .asQueryable()
+        .where((x, orderStatus) => {
+            return x.orderStatus.alternateName === orderStatus;
+        }, {
+            orderStatus: 'OrderPickup'
+        }).take(10)
+        .getItems();
+    });
+
+> `/Orders?$filter=orderStatus/alternateName eq 'OrderPickup'&$top=10`
+
+### skip(n: number)
+
+Set `$skip` system query option for defining the number of records to be skipped
+
+    const items = await context.model('Orders')
+        .asQueryable()
+        .where((x, orderStatus) => {
+            return x.orderStatus.alternateName === orderStatus;
+        }, {
+            orderStatus: 'OrderPickup'
+        }).take(25)
+        .skip(25)
+        .getItems();
+    });
+
+> `/Orders?$filter=orderStatus/alternateName eq 'OrderPickup'&$top=25&$skip=25`
+
+### orderBy(expr: QueryFunc<T>, params?: any)
+
+Define `$orderby` system query option for sorting records
+
+    const items = await context.model('People')
+        .asQueryable()
+        .orderBy(({familyName}) => familyName)
+        .getItems();
+    });
+
+> `/People?$orderby=familyName`
+
+### thenBy(expr: QueryFunc<T>, params?: any)
+
+    const items = await context.model('People')
+        .asQueryable()
+        .orderBy(({familyName}) => familyName)
+        .thenBy(({givenName}) => givenName)
+        .getItems();
+    });
+
+> `/People?$orderby=familyName,givenName`
+
+### orderByDescending(expr: QueryFunc<T>, params?: any)
+
+    const items = await context.model('People')
+        .asQueryable()
+        .orderByDescending(({familyName}) => familyName)
+        .getItems();
+    });
+
+> `/People?$orderby=familyName desc`
+
+### thenByDescending(expr: QueryFunc<T>, params?: any)
+
+    const items = await context.model('People')
+        .asQueryable()
+        .orderByDescending(({familyName}) => familyName)
+        .thenByDescending(({givenName}) => givenName)
+        .getItems();
+    });
+
+> `/People?$orderby=familyName desc,givenName desc`
