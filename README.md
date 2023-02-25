@@ -10,28 +10,61 @@
 
 ![MOST Web Framework Logo](https://github.com/themost-framework/common/raw/master/docs/img/themost_framework_v3_128.png)
 
-[MOST Web Framework](https://github.com/themost-framework/themost) core module for javascript clients.
+[@themost-framework](https://github.com/themost-framework) core module for javascript clients.
 
+`@themost/client` provides a set of methods for creating [OData v4](https://www.odata.org/documentation/) queries by using javascript closures in both client and server.
 
-#### Node Client Module
+e.g. get name and price of products with category equals to 'Laptops'
+
+    // GET /Products?$select=name,price&$filter=category eq 'Laptops'
+    
+    const items = await context.model('Products').select(({name, price}) => {
+        return {
+            name,
+            price
+        }
+    }).where(({category}) => {
+        return category === 'Laptops'
+    }).getItems();
+
+Javascript closure prototypes introduced by [@themost/query](https://github.com/themost-framework/query) uses native language and produces equivalent query expressions for both client and server environments:
+
+    import { round } from '@themost/query';
+
+    context.model('Products').select((x) => {
+        return {
+            name: x.name,
+            releaseYear: x.releaseDate.getFullYear(),
+            price: round(x.price, 2)
+        }
+    }).where((x) => {
+        return x.category === 'Laptops';
+    })
+    ...
+
+which produces the following OData expression `/Products?$select=name,year(releaseDate) as releaseYear,round(price,2) as price&$filter=category eq 'Laptops'`
+
+or an equivalent SQL statement for server-side enviroments `SELECT Products.name AS name, YEAR(Products.releaseDate) AS releaseYear, ROUND(Products.price,2) AS price FROM Products WHERE Products.category = 'Laptops'`
+
+## node.js client
 
 ![@themost/node](docs/nodejs.png)
 
 [@themost/node](https://github.com/themost-framework/node) is a client module for node.js applications which are going to use MOST Web Framework as backend api server.
 
-#### Angular Client Module
+## angular client
 
 ![@themost/angular](docs/angular.png)
 
 [@themost/angular](https://github.com/themost-framework/angular) is a client module for angular 2.x+ applications which are going to use MOST Web Framework as backend api server.
 
-#### React Client Module
+## react client
 
 ![@themost/react](docs/react.png)
 
 [@themost/react](https://github.com/themost-framework/react) is a client module for react applications which are going to use MOST Web Framework as backend api server.
 
-#### JQuery Client Module
+## jQuery client
 
 ![@themost/jquery](docs/jquery.png)
 
