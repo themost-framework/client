@@ -223,6 +223,8 @@ Read more about `$expand` at http://docs.oasis-open.org/odata/odata/v4.01/odata-
 
 or use query expressions for applying nested query options:
 
+    import { any } from '@themost/query';
+
     const items= await context.model('People')
         .asQueryable()
         .expand(
