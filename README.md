@@ -75,6 +75,24 @@ or an equivalent SQL statement for server-side enviroments `SELECT Products.name
 
 use `ClientDataContext` which is being provided by your environment and initialize an instance of `ClientDataQueryable` class.
 
+### System Query Options
+
+- [$select](#selectexpr-queryfunc-params-any)
+- [$filter](#whereexpr-queryfunc-params-any)
+    - [Logical Operators](#logical-operators)
+    - [Comparison Operators](#comparison-operators)
+    - [Aggregate Functions](#aggregate-function)
+    - [String Functions](#string-functions)
+    - [Date Functions](#date-functions)
+    - [Math Functions](#math-functions)
+- [$orderby](#orderbyexpr-queryfunc-params-any)
+- [$top](#taken-number)
+- [$skip](#skip-number)
+
+Read OData v4 specification for more information about system query options: 
+
+http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#_Toc31360955
+
 ### select(expr: QueryFunc<T>, params?: any)
 
 Define `$select` system query option by using a javascript closure:
@@ -400,6 +418,42 @@ aggregated results
 
 > `/Orders?$filter=second(orderDate) eq 30`
 
+### Math Functions
+
+#### floor
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return Math.floor(x.price) <= 177;
+        })
+        .getItems();
+
+> `/Products?$filter=floor(price) le 177`
+
+#### ceil
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return Math.ceil(x.price) >= 177;
+        })
+        .getItems();
+
+> `/Products?$filter=floor(price) ge 177`
+
+#### round
+
+    import { round } from '@themost/query';
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return round(x.price, 2) >= 177;
+        })
+        .getItems();
+
+> `/Products?$filter=round(price, 2) ge 177`
 
 ### take(n: number)
 
