@@ -85,7 +85,9 @@ use `ClientDataContext` which is being provided by your environment and initiali
     - [String Functions](#string-functions)
     - [Date Functions](#date-functions)
     - [Math Functions](#math-functions)
+    - [Arithmetic Operators](#aithmetic-operators)
 - [$orderby](#orderbyexpr-queryfunc-params-any)
+- [$expand](#expandargs-opendataquery--queryfunc)
 - [$top](#taken-number)
 - [$skip](#skip-number)
 
@@ -454,6 +456,80 @@ aggregated results
         .getItems();
 
 > `/Products?$filter=round(price, 2) ge 177`
+
+### Arithmetic operators
+
+#### add
+
+    import { round } from '@themost/query';
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return round(x.price, 2) + 100 >= 277;
+        })
+        .getItems();
+
+> `/Products?$filter=(round(price,2) add 100) ge 277`
+
+#### subtract
+
+    import { round } from '@themost/query';
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return round(x.price, 2) - 100 <= 277;
+        })
+        .getItems();
+
+> `/Products?$filter=(round(price,2) sub 100) le 277`
+
+#### multiply
+
+    import { round } from '@themost/query';
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return round(x.price, 2) * 0.75 < 800;
+        })
+        .getItems();
+
+> `/Products?$filter=(round(price,2) mul 0.75) lt 800`
+
+#### divide
+
+    import { round } from '@themost/query';
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return round(x.price, 2) / 1.25 < 800;
+        })
+        .getItems();
+
+> `/Products?$filter=(round(price,2) div 1.25) lt 800`
+
+#### case
+
+    import { round } from '@themost/query';
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .select(({name, price}) => {
+            return {
+                name: name,
+                value: price < 800 ? 'Normal' : 'Expensive'
+            }
+        })
+        .where(({category}) => {
+            return category === 'Laptops';
+        })
+        .getItems();
+
+> `/Products?$select=name,case(price lt 800:'Normal',true:'Expensive') as value&$filter=category eq 'Laptops'`
+
 
 ### take(n: number)
 
