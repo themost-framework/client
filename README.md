@@ -112,6 +112,96 @@ Define `$filter` system query option by using a javascript closure:
 
 > `/Orders?$filter=orderStatus/alternateName eq 'OrderPickup'&$top=10`
 
+#### Logical Operators
+
+Use logical operators while querying data:
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where(({category}) => {
+            return category === 'Laptops' ||
+                category === 'Desktops';
+        }).getItems();
+
+> `/People?$filter=(category eq 'Laptops' or category eq 'Desktops')`
+
+    import { round } from '@themost/query';
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where(({category, price}) => {
+            return category === 'Laptops' && price <=900;
+        }).getItems();
+
+> `/People?$filter=(category eq 'Laptops' and price le 900)`
+
+#### Comparison operators
+
+`@themost/client` supports the usage of OData comparison operators like `eq`, `ne`, `lt`, `le` etc
+
+##### equals
+
+    const item = await context.model('Orders')
+        .asQueryable()
+        .where(({id}) => {
+            return id === 100;
+        }).getItem();
+
+> `/Orders?$filter=id eq 100`
+
+##### not equals
+
+    const item = await context.model('Orders')
+        .asQueryable()
+        .where(({category}) => {
+            return category !== 'Desktops';
+        }).getItems();
+
+> `/Orders?$filter=category ne 'Desktops'`
+
+
+##### greater than
+
+    const item = await context.model('Orders')
+        .asQueryable()
+        .where(({category, price}) => {
+            return category === 'Desktops' && price > 1000;
+        }).getItems();
+
+> `/Orders?$filter=(category eq 'Desktops' and price gt 1000)`
+
+##### greater than or equal
+
+    const item = await context.model('Orders')
+        .asQueryable()
+        .where(({category, price}) => {
+            return category === 'Desktops' && price >= 1000;
+        }).getItems();
+
+> `/Orders?$filter=(category eq 'Desktops' and price ge 1000)`
+
+##### lower than
+
+    const item = await context.model('Orders')
+        .asQueryable()
+        .where(({category, price}) => {
+            return category === 'Desktops' && price < 1200;
+        }).getItems();
+
+> `/Orders?$filter=(category eq 'Desktops' and price lt 1200)`
+
+##### lower than or equal
+
+    const item = await context.model('Orders')
+        .asQueryable()
+        .where(({category, price}) => {
+            return category === 'Desktops' && price <= 1200;
+        }).getItems();
+
+> `/Orders?$filter=(category eq 'Desktops' and price le 1200)`
+
+
+
 ### take(n: number)
 
 Set `$top` system query option for defining the number of records to be taken
