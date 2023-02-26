@@ -141,7 +141,7 @@ Use logical operators while querying data:
 
 ##### equals
 
-    const item = await context.model('Orders')
+    const items = await context.model('Orders')
         .asQueryable()
         .where(({id}) => {
             return id === 100;
@@ -162,7 +162,7 @@ Use logical operators while querying data:
 
 ##### greater than
 
-    const item = await context.model('Orders')
+    const items = await context.model('Orders')
         .asQueryable()
         .where(({category, price}) => {
             return category === 'Desktops' && price > 1000;
@@ -182,7 +182,7 @@ Use logical operators while querying data:
 
 ##### lower than
 
-    const item = await context.model('Orders')
+    const items = await context.model('Orders')
         .asQueryable()
         .where(({category, price}) => {
             return category === 'Desktops' && price < 1200;
@@ -192,7 +192,7 @@ Use logical operators while querying data:
 
 ##### lower than or equal
 
-    const item = await context.model('Orders')
+    const items = await context.model('Orders')
         .asQueryable()
         .where(({category, price}) => {
             return category === 'Desktops' && price <= 1200;
@@ -200,6 +200,129 @@ Use logical operators while querying data:
 
 > `/Orders?$filter=(category eq 'Desktops' and price le 1200)`
 
+#### Aggregate functions
+
+`@themost/client` supports the usage of aggregate functions like `count`, `min`, `max` for getting
+aggregated results
+
+##### count
+
+    import { count } from '@themost/query';
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .select((x) => {
+            return {
+                category: x.category,
+                total: count(x.id)
+            };
+        }).groupBy((x) => x.category)
+        .getItems();
+
+> `/Products?$select=category,count(id) as total&$groupby=category`
+
+##### min
+
+    import { min } from '@themost/query';
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .select((x) => {
+            return {
+                category: x.category,
+                minimumPrice: min(x.price)
+            };
+        }).groupBy((x) => x.category)
+        .getItems();
+
+> `/Products?$select=category,min(price) as minimumPrice&$groupby=category`
+
+##### min
+
+    import { max } from '@themost/query';
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .select((x) => {
+            return {
+                category: x.category,
+                maxPrice: max(x.price)
+            };
+        }).groupBy((x) => x.category)
+        .getItems();
+
+> `/Products?$select=category,max(price) as maxPrice&$groupby=category`
+
+#### String functions
+
+`@themost/client` supports the usage of string functions while querying data
+
+##### indexof
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return x.name.indexOf('Intel') >= 0;
+        })
+        .getItems();
+
+> `/Products?$filter=indexof(name,'Intel') ge 0`
+
+##### startsWith
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return x.name.startsWith('Intel') === true;
+        })
+        .getItems();
+
+> `/Products?$filter=startswith(name,'Intel') eq true`
+
+##### endsWith
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return x.name.endsWith('Edition') === true;
+        })
+        .getItems();
+
+> `/Products?$filter=endswith(name,'Edition') eq true`
+
+
+##### toLowerCase
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return x.category.toLowerCase() === 'laptops';
+        })
+        .getItems();
+
+> `/Products?$filter=tolower(category) eq 'laptops'`
+
+##### toUpperCase
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return x.category.toUpperCase() === 'LAPTOPS';
+        })
+        .getItems();
+
+> `/Products?$filter=toupper(category) eq 'LAPTOPS'`
+
+##### substring
+
+    const items = await context.model('Products')
+        .asQueryable()
+        .where((x) => {
+            return x.category.substring(0,3) === 'Lapt';
+        })
+        .getItems();
+
+> `/Products?$filter=substring(category,0,3) eq 'Lapt'`
 
 
 ### take(n: number)
