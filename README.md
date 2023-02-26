@@ -324,6 +324,82 @@ aggregated results
 
 > `/Products?$filter=substring(category,0,3) eq 'Lapt'`
 
+#### Date functions
+
+`@themost/client` supports also the usage of date functions while querying data
+
+##### getDate
+
+
+    const items = await context.model('Orders')
+        .asQueryable()
+        .where((x) => {
+            return x.orderDate.getDate() === 0;
+        })
+        .getItems();
+
+> `/Orders?$filter=day(orderDate) eq 19`
+
+##### getMonth
+
+
+    const items = await context.model('Orders')
+        .asQueryable()
+        .where((x) => {
+            return x.orderDate.getMonth() === 0;
+        })
+        .getItems();
+
+> `/Orders?$filter=(month(orderDate) sub 1) eq 0`
+
+##### getFullYear
+
+
+    const items = await context.model('Orders')
+        .asQueryable()
+        .where((x) => {
+            return x.orderDate.getFullYear() === 2019;
+        })
+        .getItems();
+
+> `/Orders?$filter=(month(orderDate) sub 1) eq 0`
+
+##### getHours
+
+
+    const items = await context.model('Orders')
+        .asQueryable()
+        .where((x) => {
+            return x.orderDate.getHours() === 14;
+        })
+        .getItems();
+
+> `/Orders?$filter=hour(orderDate) eq 14`
+
+##### getMinutes
+
+
+    const items = await context.model('Orders')
+        .asQueryable()
+        .where((x) => {
+            return x.orderDate.getMinutes() === 30;
+        })
+        .getItems();
+
+> `/Orders?$filter=minute(orderDate) eq 30`
+
+##### getSeconds
+
+
+    const items = await context.model('Orders')
+        .asQueryable()
+        .where((x) => {
+            return x.orderDate.getSeconds() === 30;
+        })
+        .getItems();
+
+> `/Orders?$filter=second(orderDate) eq 30`
+
 
 ### take(n: number)
 
