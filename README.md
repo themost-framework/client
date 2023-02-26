@@ -85,7 +85,7 @@ use `ClientDataContext` which is being provided by your environment and initiali
     - [String Functions](#string-functions)
     - [Date Functions](#date-functions)
     - [Math Functions](#math-functions)
-    - [Arithmetic Operators](#aithmetic-operators)
+    - [Arithmetic Operators](#arithmetic-operators)
 - [$orderby](#orderbyexpr-queryfunc-params-any)
 - [$expand](#expandargs-opendataquery--queryfunc)
 - [$top](#taken-number)
