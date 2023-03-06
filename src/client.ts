@@ -754,7 +754,7 @@ export class ClientDataQueryable {
         return this;
     }
 
-    private escape_(val: any) {
+    private escape_(val: any): any {
         if ((val == null) || (typeof val === 'undefined')) {
             return 'null';
         }
@@ -780,7 +780,7 @@ export class ClientDataQueryable {
             return '\'' + year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second + '.' + millisecond + timezone + '\'';
         }
         if (val instanceof Array) {
-            const values = [];
+            const values: string[] = [];
             val.forEach((x) => {
                 values.push(this.escape_(x));
             });
