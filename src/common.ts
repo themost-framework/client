@@ -184,11 +184,11 @@ export class TextUtils {
         return false;
     }
 
-    public static parseDate(s: string): Date {
+    public static parseDate(s: string): Date | null {
         if (TextUtils.isDate(s)) {
             return new Date(s);
         }
-        return;
+        return null;
     }
 
     /**
@@ -261,7 +261,7 @@ export class TextUtils {
             return '\'' + year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second + '.' + millisecond + timezone + '\'';
         }
         if (val instanceof Array) {
-            const values = [];
+            const values: any[] = [];
             val.forEach((x) => {
                 values.push(TextUtils.escape(x));
             });
@@ -290,8 +290,8 @@ export class TextUtils {
     }
 
     // tslint:disable max-line-length
-    private static REG_DATETIME_ISO = /^\d{4}-([0]\d|1[0-2])-([0-2]\d|3[01])(?:[T ](\d+):(\d+)(?::(\d+)(?:\.(\d+))?)?)(?:Z(-?\d*))?([+-](\d+):(\d+))?$/;
-    private static REG_DATE_ISO = /^\d{4}-([0]\d|1[0-2])-([0-2]\d|3[01])$/;
+    private static REG_DATETIME_ISO = /^\d{4}-(0\d|1[0-2])-([0-2]\d|3[01])[T ](\d+):(\d+)(?::(\d+)(?:\.(\d+))?)?(?:Z(-?\d*))?([+-](\d+):(\d+))?$/;
+    private static REG_DATE_ISO = /^\d{4}-(0\d|1[0-2])-([0-2]\d|3[01])$/;
     private static REG_GUID_STRING = /^({?([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}}?)$/;
     private static REG_ABSOLUTE_URI = /^((https?|ftps?):\/\/)([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
     private static REG_RELATIVE_URI = /^([\/\w .-]*)*\/?$/;
@@ -371,7 +371,7 @@ export interface DataServiceExecuteOptions {
 
 export interface ClientDataServiceBase {
 
-    setHeader(name: string, value: string);
+    setHeader(name: string, value: string): void;
 
     getHeaders(): any;
     /**
@@ -399,7 +399,7 @@ export interface ClientDataServiceBase {
      * Converts a URL into one that is usable on the requesting client.
      * @param {string} relative
      */
-    resolve(relative: string);
+    resolve(relative: string): string;
 
     getOptions(): ClientDataContextOptions;
 
