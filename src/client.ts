@@ -719,7 +719,7 @@ export class ClientDataQueryable {
         return this;
     }
 
-    private compare_(op, value): ClientDataQueryable {
+    private compare_(op: any, value: any): ClientDataQueryable {
         Args.notNull(this._privates.left, 'The left operand');
         this._privates.op = op;
         this._privates.right = value; return this.append_();
@@ -1107,6 +1107,7 @@ export class ParserDataService extends ClientDataService {
         super(base, options);
     }
 
+    // noinspection JSUnusedLocalSymbols
     public execute(options: DataServiceExecuteOptions): Promise<any> {
         throw new Error('Method not allowed.');
     }
