@@ -330,6 +330,7 @@ export class Args {
 }
 
 export interface DataServiceQueryParams {
+    [key: string]: any;
     $filter: string;
     $groupby: string;
     $select: string;
