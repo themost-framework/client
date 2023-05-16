@@ -23,7 +23,7 @@ module.exports = [{
     external: Object.keys(pkg.dependencies),
     plugins: [
         typescript({
-            declaration: false
+            declaration: true
         })
     ]
 }];
