@@ -14,9 +14,6 @@
         "outDir": "./",
         "stripInternal": true,
         "paths": {
-            "@themost/query": [
-                "../../modules/query/src/index"
-            ]
         },
         "types": [
             "node"

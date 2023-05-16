@@ -1,4 +1,4 @@
-const typescript = require('rollup-plugin-typescript2');
+const typescript = require('@rollup/plugin-typescript');
 const dist = './dist/';
 const name = 'index';
 const pkg = require('./package.json');
@@ -23,7 +23,7 @@ module.exports = [{
     external: Object.keys(pkg.dependencies),
     plugins: [
         typescript({
-            declaration: false
+            declaration: true
         })
     ]
 }];

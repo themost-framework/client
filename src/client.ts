@@ -167,7 +167,13 @@ export class ClientDataQueryable {
             }
 
         }
-        return Object.assign({ }, this._params);
+        const result = Object.assign({ }, this._params);
+        Object.keys(result).forEach((key: string) => {
+            if (Object.prototype.hasOwnProperty.call(result, key) && result[key] == null) {
+                delete result[key];
+            }
+        });
+        return result;
     }
 
     /**
