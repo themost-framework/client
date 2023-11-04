@@ -15,6 +15,7 @@ docs
 # test
 src/test
 spec
+src/test.ts
 
 # karma
 karma.conf.js
