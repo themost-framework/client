@@ -28,3 +28,6 @@ tsconfig.spec.json
 
 # tslint
 tslint.json
+
+# .gitpod
+.gitpod.yml
