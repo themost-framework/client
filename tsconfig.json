@@ -11,7 +11,7 @@
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "declaration": true,
-        "outDir": "./",
+        "outDir": "./dist",
         "stripInternal": true,
         "paths": {
         },
@@ -28,7 +28,6 @@
         "test"
     ],
     "files": [
-      "src/index.ts",
-      "src/common.ts"
+      "src/index.ts"
     ]
 }

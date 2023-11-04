@@ -4,7 +4,7 @@ const name = 'index';
 const pkg = require('./package.json');
 
 module.exports = [{
-    input: './src/index.ts',
+    input: 'src/index.ts',
     output: [
         {
             file: `${dist}${name}.cjs.js`,
@@ -22,8 +22,6 @@ module.exports = [{
     ],
     external: Object.keys(pkg.dependencies),
     plugins: [
-        typescript({
-            declaration: true
-        })
+        typescript({ tsconfig: './tsconfig.json' })
     ]
 }];
