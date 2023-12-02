@@ -2,6 +2,9 @@
 // https://karma-runner.github.io/1.0/config/configuration-file.html
 // tslint:disable trailing-comma
 // tslint:disable object-literal-sort-keys
+require('dotenv').config({ path: '.env' })
+
+
 module.exports = function(config) {
   config.set({
     basePath: "./src/",
@@ -11,6 +14,7 @@ module.exports = function(config) {
     ],
     port: 8080,
     plugins: [
+      require('./karma-test-api-server'),
       require("karma-jasmine"),
       require("karma-typescript"),
       require("karma-chrome-launcher"),
@@ -22,7 +26,12 @@ module.exports = function(config) {
     },
     karmaTypescriptConfig: {
       tsconfig: "../tsconfig.spec.json",
-      sourceMap: true
+      sourceMap: true,
+      bundlerOptions: {
+          transforms: [
+              require("karma-typescript-es6-transform")()
+          ]
+      }
     },
     customLaunchers: {
       ChromeHeadlessNoSandbox: {

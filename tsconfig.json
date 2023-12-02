@@ -25,7 +25,8 @@
     },
     "exclude": [
         "node_modules",
-        "test"
+        "test",
+        ".eslintrc.js",
     ],
     "files": [
       "src/index.ts"

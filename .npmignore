@@ -19,6 +19,7 @@ src/test.ts
 
 # karma
 karma.conf.js
+karma-test-api-server.js
 
 # build
 rollup.config.js
@@ -29,6 +30,8 @@ tsconfig.spec.json
 
 # tslint
 tslint.json
+.eslintignore
+.eslintrc.js
 
 # .gitpod
 .gitpod.yml
