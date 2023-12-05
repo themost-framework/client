@@ -17,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/themost-framework/client.git"
   },
-  "author": "THEMOST LP <support@.themost.io>",
+  "author": "THEMOST LP <themost-framework@themost.io>",
   "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/themost-framework/client/issues"
