@@ -11,7 +11,9 @@ module.exports = [
       sourcemap: true
     },
     external: Object.keys(pkg.dependencies),
-    plugins: [typescript()]
+    plugins: [typescript({
+      tsconfig: path.resolve(process.cwd(), 'tsconfig.lib.json')
+    })]
   },
   {
     input: 'src/index.ts',
@@ -21,7 +23,9 @@ module.exports = [
       sourcemap: true
     },
     external: Object.keys(pkg.dependencies),
-    plugins: [typescript()]
+    plugins: [typescript({
+      tsconfig: path.resolve(process.cwd(), 'tsconfig.lib.json')
+    })]
   },
   {
     input: 'src/index.ts',
@@ -32,7 +36,9 @@ module.exports = [
       sourcemap: true
     },
     external: Object.keys(pkg.dependencies),
-    plugins: [typescript()]
+    plugins: [typescript({
+      tsconfig: path.resolve(process.cwd(), 'tsconfig.lib.json')
+    })]
   },
   {
     input: path.resolve(process.cwd(), 'common/src/index.ts'),
