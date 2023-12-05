@@ -43,7 +43,7 @@ module.exports = function(config) {
         ]
       }
     },
-    reporters: [ 'kjhtml', 'mocha' ],
+    reporters: [ 'kjhtml' ],
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,

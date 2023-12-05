@@ -1,4 +1,4 @@
-import { avg, round } from '@themost/query';
+import { avg, count, round } from '@themost/query';
 import { TestContext } from './TestUtils';
 describe("BasicClientDataContext", () => {
 
@@ -64,6 +64,49 @@ describe("BasicClientDataContext", () => {
       expect(item.givenName.indexOf("Chri")).toBeGreaterThanOrEqual(0);
       expect(item.name).toEqual(item.givenName.concat(" ", item.familyName));
     }
+  });
+
+  it("should use count", async () => {
+    const q = context
+      .model("Orders")
+      .select((x: { id: number, orderStatus: { alternateName: string } }) => {
+        const name = x.orderStatus.alternateName;
+        const total = count(x.id);
+        return {
+          name,
+          total,
+        };
+      })
+      .where((x: { orderedItem: { category: string } }) => x.orderedItem.category === "Laptops")
+      .groupBy((x: { orderStatus: { alternateName: string } }) => x.orderStatus.alternateName);
+    const data: {name: string, total: number}[] = await q.getItems();
+    expect(data.length).toBeTruthy();
+    expect(data[0].total).toBeTruthy();
+  });
+
+  it("should use insert", async () => {
+    const product = {
+      name: "Acer New Gaming Laptop 17",
+      model: "AC1705",
+      price: 989.5,
+      releaseDate: new Date(),
+    };
+    await context.model("Products").save(product);
+    const q = context
+      .model("Products")
+      .asQueryable()
+      .select(({ id, name, model, price }) => ({
+        id,
+        name,
+        model,
+        price,
+      }))
+      .where((x: { model: string }) => {
+        return x.model === "AC1705";
+      });
+    const item: { id: number, name: string, model: string, price: number } = await q.getItem();
+    expect(item).toBeTruthy();
+    expect(item.id).toBeTruthy();
   });
 
 });
