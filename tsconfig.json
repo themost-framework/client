@@ -1,38 +1,36 @@
 {
+    "$schema": "https://json.schemastore.org/tsconfig",
     "compilerOptions": {
         "baseUrl": ".",
+        "outDir": "./dist/",
         "target": "ES2015",
-        "module": "ES2015",
-        "moduleResolution": "node",
+        "module": "ESNext",
         "sourceMap": true,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true,
-        "removeComments": false,
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
+        "esModuleInterop": true,
         "declaration": true,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "declarationDir": "./dist/",
-        "outDir": "./dist",
-        "stripInternal": true,
+        "lib": [
+            "DOM",
+            "ES2017"
+        ],
         "paths": {
-            "@themost/client/common": ["common/src/index.ts"],
-            "@themost/client": ["src/index.ts"]
-        },
-        "types": [
-            "node"
-        ],
-        "typeRoots": [
-            "node_modules/@types"
-        ],
-        "lib": ["es2017", "dom"]
+            "@themost/client/common": [
+                "./common/src/index"
+            ],
+            "@themost/client": [
+                "./src/index"
+            ]
+        }
     },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.d.ts"
+    ],
     "exclude": [
         "node_modules",
-        "test",
-        ".eslintrc.js",
-    ],
-    "files": [
-      "src/index.ts",
-      "common/src/index.ts"
+        "test"
     ]
 }
