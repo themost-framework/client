@@ -30,7 +30,6 @@
         "src/**/*.d.ts"
     ],
     "exclude": [
-        "node_modules",
-        "test"
+        "node_modules"
     ]
 }
