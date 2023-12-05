@@ -16,6 +16,8 @@ docs
 src/test
 spec
 src/test.ts
+.env.test
+.env
 
 # karma
 karma.conf.js
