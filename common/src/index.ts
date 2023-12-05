@@ -1,2 +1,2 @@
-export * from './BasicClientDataService';
-export * from './BasicClientDataContext';
+export * from './BasicDataService';
+export * from './BasicDataContext';

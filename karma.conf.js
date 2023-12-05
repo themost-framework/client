@@ -7,10 +7,11 @@ require('dotenv').config({ path: '.env' })
 
 module.exports = function(config) {
   config.set({
-    basePath: "./src/",
-    frameworks: ["jasmine", "karma-typescript"],
+    basePath: ".",
+    frameworks: ["jasmine", "karma-typescript", "api"],
     files: [
-      { pattern: "**/*.ts" }
+      { pattern: "src/**/*.ts" },
+      { pattern: "common/src/**/*.ts" }
     ],
     port: 8080,
     plugins: [
@@ -25,7 +26,7 @@ module.exports = function(config) {
       "**/*.ts": "karma-typescript" // *.tsx for React Jsx
     },
     karmaTypescriptConfig: {
-      tsconfig: "../tsconfig.spec.json",
+      tsconfig: "tsconfig.spec.json",
       sourceMap: true,
       bundlerOptions: {
           transforms: [

@@ -7,7 +7,7 @@ import { Buffer } from 'buffer';
 /**
  * Represents a default data service that extends the ClientDataService class.
  */
-class BasicClientDataService extends ClientDataService {
+class BasicDataService extends ClientDataService {
 
     private _metadata: EdmSchema | null = null;
 
@@ -115,5 +115,5 @@ class BasicClientDataService extends ClientDataService {
 }
 
 export {
-    BasicClientDataService
+    BasicDataService
 }

@@ -25,8 +25,12 @@
             "dom"
         ],
         "paths": {
-            "@themost/client/common": ["common/src/index.ts"],
-            "@themost/client": ["src/index.ts"]
+            "@themost/client/common": [
+                "common/src/index"
+            ],
+            "@themost/client": [
+                "src/index"
+            ]
         }
     },
     "exclude": [
