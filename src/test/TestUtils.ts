@@ -2,7 +2,9 @@ import { BasicDataContext, BasicDataService } from '@themost/client/common';
 
 export class TestContext extends BasicDataContext {
     constructor() {
-        super("/api/");
+        super("/api/", {
+            useResponseConversion: true
+        });
     }
     async authenticate() {
         const service = new BasicDataService("/");
