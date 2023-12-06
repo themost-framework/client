@@ -91,7 +91,7 @@ describe("BasicClientDataContext", () => {
       price: 989.5,
       releaseDate: new Date(),
     };
-    await context.model("Products").save(product);
+    await context.model("Products").insert(product);
     const q = context
       .model("Products")
       .asQueryable()
@@ -107,6 +107,7 @@ describe("BasicClientDataContext", () => {
     const item: { id: number, name: string, model: string, price: number } = await q.getItem();
     expect(item).toBeTruthy();
     expect(item.id).toBeTruthy();
+    await context.model("Products").remove(product);
   });
 
 });

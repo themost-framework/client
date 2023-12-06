@@ -2,12 +2,12 @@ import { BasicDataContext, BasicDataService } from '@themost/client/common';
 
 export class TestContext extends BasicDataContext {
     constructor() {
-        super("/api/", {
+        super("http://localhost:8080/api/", {
             useResponseConversion: true
         });
     }
     async authenticate() {
-        const service = new BasicDataService("/");
+        const service = new BasicDataService("http://localhost:8080/");
         const {access_token} = await service.execute({
             url: "/auth/token",
             method: "POST",

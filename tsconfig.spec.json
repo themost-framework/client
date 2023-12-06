@@ -36,8 +36,8 @@
         "node_modules"
     ],
     "include": [
-        "**/*.ts",
-        "**/*.spec.ts",
-        "**/*.d.ts"
+        "common/src/**/*.ts",
+        "src/**/*.ts",
+        "src/**/*.spec.ts"
     ]
 }

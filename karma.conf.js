@@ -3,6 +3,7 @@
 // tslint:disable trailing-comma
 // tslint:disable object-literal-sort-keys
 require('dotenv').config({ path: '.env' })
+const path = require('path');
 
 module.exports = function(config) {
   config.set({
@@ -26,7 +27,17 @@ module.exports = function(config) {
     },
     karmaTypescriptConfig: {
       tsconfig: "./tsconfig.spec.json",
-      sourceMap: true
+      bundlerOptions: {
+        transforms: [
+          require('karma-typescript-es6-transform')()
+        ],
+        resolve: {
+          alias: {
+            '@themost/client/common': path.resolve(__dirname, 'common/src/index.ts'),
+            '@themost/client': path.resolve(__dirname, 'src/index.ts')
+          }
+        }
+      }
     },
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
@@ -37,7 +48,7 @@ module.exports = function(config) {
         ]
       }
     },
-    reporters: [ 'kjhtml' ],
+    reporters: [ 'kjhtml', 'mocha' ],
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,

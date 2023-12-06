@@ -26,18 +26,20 @@ class BasicDataService extends ClientDataService {
         const config: { method: string; url: string; headers: DataServiceHeaders; } = {
             method: options.method,
             url: this.resolve(options.url),
-            headers: this.getHeaders() // set service headers
+            headers: Object.assign({}, this.getHeaders()) // set service headers
         };
         // assign options headers if any
         if (options.headers) {
             Object.assign(config.headers, options.headers);
         }
 
-        if (options.method === 'POST' || options.method === 'PUT') {
+        if (options.method === 'POST' || options.method === 'PUT' || options.method === 'DELETE') {
             // add body
-            Object.assign(config, {
-                data: options.data
-            });
+            if (options.data != null) {
+                Object.assign(config, {
+                    data: options.data
+                });
+            }
         } else {
             // for HEAD, GET, OPTIONS, DELETE set query params
             if (options.data != null) {
