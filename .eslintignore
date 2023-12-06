@@ -1,4 +1,5 @@
 .eslintrc.js
+karma.conf.js
 
 # rollup
 rollup.config.js

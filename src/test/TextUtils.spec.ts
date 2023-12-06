@@ -1,4 +1,4 @@
-import {TextUtils} from '../common';
+import {TextUtils} from '@themost/client';
 describe('TextUtils', () => {
     it('execute TextUtils.isNotEmptyString(value)', () => {
         expect(TextUtils.isNotEmptyString(null)).toBe(false);

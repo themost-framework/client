@@ -1,4 +1,4 @@
-import { ResponseError } from '../index';
+import { ResponseError } from '@themost/client';
 
 describe('ResponseError', () => {
     it('should create a ResponseError instance with the provided message and statusCode', () => {

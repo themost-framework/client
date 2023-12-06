@@ -14,8 +14,7 @@
         "stripInternal": true,
         "types": [
             "node",
-            "jasmine",
-            "axios"
+            "jasmine"
         ],
         "typeRoots": [
             "node_modules/@types"

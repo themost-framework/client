@@ -4,7 +4,6 @@
 // tslint:disable object-literal-sort-keys
 require('dotenv').config({ path: '.env' })
 
-
 module.exports = function(config) {
   config.set({
     basePath: ".",
@@ -26,13 +25,8 @@ module.exports = function(config) {
       "**/*.ts": "karma-typescript" // *.tsx for React Jsx
     },
     karmaTypescriptConfig: {
-      tsconfig: "tsconfig.spec.json",
-      sourceMap: true,
-      bundlerOptions: {
-          transforms: [
-              require("karma-typescript-es6-transform")()
-          ]
-      }
+      tsconfig: "./tsconfig.spec.json",
+      sourceMap: true
     },
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
