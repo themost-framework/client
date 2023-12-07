@@ -20,10 +20,15 @@ module.exports = function(config) {
       require("karma-typescript"),
       require("karma-chrome-launcher"),
       require("karma-jasmine-html-reporter"),
-      require('karma-mocha-reporter')
+      require('karma-mocha-reporter'),
+      require("karma-coverage-istanbul-reporter")
     ],
     preprocessors: {
       "**/*.ts": "karma-typescript" // *.tsx for React Jsx
+    },
+    coverageIstanbulReporter: {
+      // reports can be any that are listed here: https://github.com/istanbuljs/istanbuljs/tree/73c25ce79f91010d1ff073aa6ff3fd01114f90db/packages/istanbul-reports/lib
+      reports: ['text'],
     },
     karmaTypescriptConfig: {
       tsconfig: "./tsconfig.spec.json",
@@ -48,7 +53,7 @@ module.exports = function(config) {
         ]
       }
     },
-    reporters: [ 'kjhtml', 'mocha' ],
+    reporters: [ 'kjhtml', 'mocha', 'coverage-istanbul' ],
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,

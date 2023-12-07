@@ -8,6 +8,15 @@ describe("BasicClientDataContext", () => {
     await context.authenticate();
   })
 
+  it("should load metadata", async () => {
+    const metadata = await context.getMetadata();
+    expect(metadata).toBeTruthy();
+    expect(metadata.EntityContainer).toBeTruthy();
+    expect(metadata.EntityContainer.EntitySet).toBeTruthy();
+    const entitySet = metadata.EntityContainer.EntitySet.find((x) => x.Name === "Products");
+    expect(entitySet).toBeTruthy();
+  });
+
   it("should use and", async () => {
     const query = context
       .model("Products")
