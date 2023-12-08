@@ -28,6 +28,7 @@ rollup.config.js
 
 # typescript
 tsconfig.json
+tsconfig.lib.json
 tsconfig.spec.json
 
 # tslint
