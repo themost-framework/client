@@ -9,8 +9,6 @@ import { Buffer } from 'buffer';
  */
 class BasicDataService extends ClientDataService {
 
-    private _metadata: EdmSchema | null = null;
-
     // eslint-disable-next-line no-useless-constructor
     constructor(base: string, options?: ClientDataContextOptions) {
         super(base, options);
@@ -93,9 +91,6 @@ class BasicDataService extends ClientDataService {
      * @returns {Promise<EdmSchema>}
      */
     async getMetadata(): Promise<EdmSchema> {
-        if (this._metadata != null) {
-            return this._metadata;
-        }
         const config: any = {
             method: 'GET',
             url: this.resolve('$metadata'),
@@ -105,8 +100,7 @@ class BasicDataService extends ClientDataService {
         const response = await axios(config);
         if (response.status === 200) {
             // load schema
-            this._metadata = EdmSchema.loadXML(response.data) as EdmSchema;
-            return this._metadata;
+            return EdmSchema.loadXML(response.data) as EdmSchema;
         }
         // otherwise throw error
         throw new ResponseError(

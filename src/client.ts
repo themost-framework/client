@@ -573,7 +573,7 @@ export class ClientDataQueryable {
             return this;
         }
         Args.check(typeof expr === 'string', `Invalid order by argument. Expected string`);
-        this._params.$orderby = `${expr} desc'`;
+        this._params.$orderby = `${expr} desc`;
         return this;
     }
 

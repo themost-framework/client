@@ -151,4 +151,12 @@ describe('ClientDataQueryable', () => {
         const queryParams = q.getParams();
         expect(queryParams.$filter).toBe('orderStatus/alternateName eq \'OrderStatusCancelled\'');
     });
+
+    it('should use simple order by statement', () => {
+        let query = new ClientDataQueryable('Orders', service).orderBy('dateCreated');
+        expect(query.toString()).toBe('/Orders?$orderby=dateCreated');
+        query = new ClientDataQueryable('Orders', service).orderByDescending('dateCreated');
+        expect(query.toString()).toBe('/Orders?$orderby=dateCreated desc');
+    });
+
 });
