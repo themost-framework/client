@@ -16,19 +16,28 @@ docs
 src/test
 spec
 src/test.ts
+.env.test
+.env
 
 # karma
 karma.conf.js
+karma-test-api-server.js
 
 # build
 rollup.config.js
 
 # typescript
 tsconfig.json
+tsconfig.lib.json
 tsconfig.spec.json
 
 # tslint
 tslint.json
+.eslintignore
+.eslintrc.js
 
 # .gitpod
 .gitpod.yml
+
+# tmp
+.pytest_cache

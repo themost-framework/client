@@ -1,5 +1,4 @@
 {
-    "$schema": "https://json.schemastore.org/tsconfig",
     "compilerOptions": {
         "baseUrl": ".",
         "outDir": "./dist/",
@@ -7,21 +6,17 @@
         "module": "ESNext",
         "sourceMap": true,
         "esModuleInterop": true,
-        "declaration": true,
+        "declaration": false,
         "moduleResolution": "node",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "declarationDir": "./dist/",
         "lib": [
             "DOM",
             "ES2017"
         ],
         "paths": {
-            "@themost/client/common": [
-                "./common/src/index"
-            ],
             "@themost/client": [
-                "./src/index"
+                "../src/index"
             ]
         }
     },

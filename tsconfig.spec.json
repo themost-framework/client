@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
-        "target": "es2015",
-        "module": "commonjs",
+        "baseUrl": ".",
+        "target": "ES2015",
+        "module": "CommonJS",
         "moduleResolution": "node",
         "sourceMap": true,
         "emitDecoratorMetadata": true,
@@ -21,14 +22,22 @@
         "lib": [
             "es2017",
             "dom"
-        ]
+        ],
+        "paths": {
+            "@themost/client/common": [
+                "common/src/index"
+            ],
+            "@themost/client": [
+                "src/index"
+            ]
+        }
     },
     "exclude": [
         "node_modules"
     ],
     "include": [
-        "**/*.ts",
-        "**/*.spec.ts",
-        "**/*.d.ts"
+        "common/src/**/*.ts",
+        "src/**/*.ts",
+        "src/**/*.spec.ts"
     ]
 }

@@ -1,0 +1,9 @@
+{
+    "private": true,
+    "module": "dist/index.esm.js",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "rimraf dist && rollup -c ./rollup.config.js -m"
+    }
+}

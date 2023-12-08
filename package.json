@@ -1,13 +1,13 @@
 {
   "name": "@themost/client",
-  "version": "2.11.0",
+  "version": "2.12.0",
   "description": "MOST Web Framework Codename Blueshift - Client Common",
   "module": "dist/index.esm.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rimraf dist && rollup -c ./rollup.config.js -m",
-    "watch": "rimraf dist && rollup -c ./rollup.config.js -m -w",
+    "build": "rimraf dist && rimraf common/dist && rollup -c ./rollup.config.js -m",
+    "watch": "rimraf dist && rimraf common/dist && rollup -c ./rollup.config.js -m -w",
     "prepublishOnly": "npm run build",
     "test": "karma start",
     "test:node": "jasmine",
@@ -17,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/themost-framework/client.git"
   },
-  "author": "THEMOST LP <support@.themost.io>",
+  "author": "THEMOST LP <themost-framework@themost.io>",
   "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/themost-framework/client/issues"
@@ -25,27 +25,38 @@
   "homepage": "https://github.com/themost-framework/client#readme",
   "dependencies": {
     "@themost/events": "^1.1.0",
-    "@themost/query": "^2.11.0",
-    "@themost/xml": "^2.5.1"
+    "@themost/query": "^2.11.2",
+    "@themost/xml": "^2.5.1",
+    "axios": "^1.6.2",
+    "buffer": "^6.0.3"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.1",
+    "@themost/test": "^2.3.4",
     "@types/jasmine": "^3.10.0",
     "@types/node": "^16.11.4",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
     "ansi-regex": "^5.0.1",
     "core-js": "^2.6.12",
+    "dotenv": "^16.3.1",
+    "eslint": "^8.54.0",
+    "eslint-plugin-jsdoc": "^46.9.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
     "jasmine": "^4.5.0",
     "jasmine-spec-reporter": "^7.0.0",
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^3.1.0",
+    "karma-coverage-istanbul-reporter": "^3.0.3",
     "karma-jasmine": "^4.0.1",
     "karma-jasmine-html-reporter": "^1.7.0",
     "karma-mocha-reporter": "^2.2.5",
     "karma-typescript": "^5.5.3",
+    "karma-typescript-es6-transform": "^5.5.4",
     "rollup": "^2.70.1",
     "rollup-plugin-commonjs": "^10.1.0",
     "ts-node": "^10.9.1",
-    "tslint": "^6.1.3",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^4.4.4"
   }
 }

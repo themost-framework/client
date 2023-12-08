@@ -1,21 +1,15 @@
-// MOST Web Framework 2.0 Copyright (c) 2017-2021, THEMOST LP All rights reserved
+// MOST Web Framework 2.0 Copyright (c) 2017-2023, THEMOST LP All rights reserved
 import {EdmSchema} from './metadata';
 
 export class CodedError extends Error {
     constructor(message: string, public code: string) {
         super(message);
-        // set prototype for a class that extends Error in typescript
-        // @ts-ignore
-        this.__proto__ = new.target.prototype;
     }
 }
 
 export class ResponseError extends Error {
     constructor(message: string, public statusCode: number) {
         super(message);
-        // set prototype for a class that extends Error in typescript
-        // @ts-ignore
-        this.__proto__ = new.target.prototype;
     }
 }
 
@@ -222,6 +216,7 @@ export class TextUtils {
             }
             switch (x) {
                 case '%s':
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
                     return p1.toString();
                 case '%d':
                     return parseInt(p1, 10);
@@ -282,10 +277,10 @@ export class TextUtils {
             return '\'' + res + '\'';
         }
         // otherwise get valueOf
-        if (val.hasOwnProperty('$name')) {
-            return val.$name;
+        if (Object.prototype.hasOwnProperty.call(val, '$name')) {
+            return (val as { $name: string }).$name;
         } else {
-            return TextUtils.escape(val.valueOf());
+            return TextUtils.escape(Object.prototype.valueOf.call(val));
         }
     }
 
@@ -343,6 +338,30 @@ export interface DataServiceQueryParams {
     $levels: number;
 }
 
+export interface DataServiceHeaders {
+    [key: string]: string;
+    'Accept'?: string;
+    'Accept-Charset'?: string;
+    'Accept-Encoding'?: string;
+    'Content-Type'?: string;
+    'If-Match'?: string;
+    'If-None-Match'?: string;
+    'Prefer'?: string;
+    'Prefer-Await'?: string;
+    'Authorization'?: string;
+    'Accept-Language'?: string;
+    'OData-Version'?: string;
+    'OData-MaxVersion'?: string;
+    'OData-Isolation'?: string;
+    'OData-MaxEntityCount'?: string;
+    'OData-EntityId'?: string;
+    'OData-DeltaLink'?: string;
+    'OData-Id'?: string;
+    'Cache-Control'?: string;
+    'Content-Length'?: string;
+    'Encoding'?: string;
+}
+
 
 export interface ClientDataContextOptions {
     useMediaTypeExtensions?: boolean;
@@ -367,7 +386,7 @@ export interface DataServiceExecuteOptions {
     method: string;
     url: string;
     data: any;
-    headers: any;
+    headers: DataServiceHeaders;
 }
 
 export interface ClientDataServiceBase {
@@ -426,15 +445,13 @@ export interface ClientDataContextBase {
 }
 
 export function configurable(value: boolean) {
-    // tslint:disable-next-line:only-arrow-functions
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
         descriptor.configurable = value;
     };
 }
 
 export function enumerable(value: boolean) {
-    // tslint:disable-next-line:only-arrow-functions
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
         descriptor.enumerable = value;
     };
 }
