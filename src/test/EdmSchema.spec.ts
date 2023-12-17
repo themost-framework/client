@@ -1,13 +1,39 @@
 import { EdmSchema } from '@themost/client';
 
-@EdmSchema.entitySet('Products')
-class Product {
+class Thing {
+    id?: number;
+    name?: string;
+    description?: string;
+    createdBy?: number;
+    modifiedBy?: number;
+    dateCreated?: Date;
+    dateModified?: Date;
+    sameAs?: string;
+    url?: string;
+    image?: string;
+    additionalType?: string;
+    identifier?: string;
+    alternateName?: string;
+    disambiguatingDescription?: string;
+}
 
+@EdmSchema.entitySet('Products')
+class Product extends Thing {
+    model?: string;
+    productID?: string;
+    category?: string;
+    releaseDate?: Date;
+    discontinued?: boolean;
+    price?: number;
+    isRelatedTo?: Product | number;
+    isSimilarTo?: Product | number;
 }
 
 @EdmSchema.entityType('Order')
-class Order {
-
+class Order extends Thing {
+    orderDate?: Date;
+    customer?: Person | number;
+    orderedItem?: Product | number;
 }
 
 @EdmSchema.entityType()
