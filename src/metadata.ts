@@ -1,4 +1,16 @@
-import {XDocument, XNode, XSerializer} from '@themost/xml';
+import { XDocument, XNode, XSerializer } from '@themost/xml';
+
+declare interface EntityTypeAnnotation {
+    Entity: {
+        name?: string
+    }
+}
+
+declare interface EntitySetAnnotation {
+    EntitySet: {
+        name?: string
+    }
+}
 
 /**
  * Represents an OData service metadata document
@@ -19,20 +31,45 @@ export class EdmSchema {
     public Action: EdmAction[] = [];
     public Function: EdmFunction[] = [];
     public readXml(node: XNode) {
-        this.EntityType = node.selectNodes('EntityType').map( (x) => {
+        this.EntityType = node.selectNodes('EntityType').map((x) => {
             return XSerializer.deserialize(x, EdmEntityType);
         });
         const entityContainerNode = node.selectSingleNode('EntityContainer');
         if (entityContainerNode) {
             this.EntityContainer = XSerializer.deserialize(entityContainerNode, EdmEntityContainer);
         }
-        this.Action = node.selectNodes('Action').map( (x) => {
+        this.Action = node.selectNodes('Action').map((x) => {
             return XSerializer.deserialize(x, EdmAction);
         });
-        this.Function = node.selectNodes('Function').map( (x) => {
+        this.Function = node.selectNodes('Function').map((x) => {
             return XSerializer.deserialize(x, EdmFunction);
         });
     }
+
+    static entityType(name?: string) {
+        return function (target: Function) {
+            // get entity type
+            const entityType = target as unknown as EntityTypeAnnotation;
+            // use name or target entity name
+            const entityName = name || target.name;
+            // assign entity type annotation
+            entityType.Entity = Object.assign({
+                name: entityName
+            });
+        }
+    }
+
+    static entitySet(name: string) {
+        return function (target: Function) {
+            // get entity type
+            const entitySet = target as unknown as EntitySetAnnotation;
+            // assign entity type annotation
+            entitySet.EntitySet = Object.assign({
+                name
+            });
+        }
+    }
+
 }
 
 /**
@@ -41,7 +78,7 @@ export class EdmSchema {
 export class EdmEntityContainer {
     public EntitySet: EdmEntitySet[] = [];
     public readXml(node: XNode) {
-        this.EntitySet = node.selectNodes('EntitySet').map( (x) => {
+        this.EntitySet = node.selectNodes('EntitySet').map((x) => {
             return XSerializer.deserialize(x, EdmEntitySet);
         });
     }
@@ -55,7 +92,7 @@ export class EdmProcedure {
     public readXml(node: XNode) {
         this.Name = node.getAttribute('Name');
         this.IsBound = node.getAttribute('IsBound') === 'true';
-        this.Parameter = node.selectNodes('Parameter').map( (x) => {
+        this.Parameter = node.selectNodes('Parameter').map((x) => {
             return XSerializer.deserialize(x, EdmParameter);
         });
         const returnTypeNode = node.selectSingleNode('ReturnType');
@@ -148,7 +185,7 @@ export class EdmProperty {
         if (longDescription) {
             this.LongDescription = longDescription.getAttribute('String');
         }
-        this.Annotations = node.selectNodes('Annotation').map( (annotationNode) => {
+        this.Annotations = node.selectNodes('Annotation').map((annotationNode) => {
             return XSerializer.deserialize(annotationNode, EdmAnnotation);
         });
     }
@@ -187,7 +224,7 @@ export class EdmNavigationProperty {
         if (longDescription) {
             this.LongDescription = longDescription.getAttribute('String');
         }
-        this.Annotations = node.selectNodes('Annotation').map( (annotationNode) => {
+        this.Annotations = node.selectNodes('Annotation').map((annotationNode) => {
             return XSerializer.deserialize(annotationNode, EdmAnnotation);
         });
     }
@@ -199,7 +236,7 @@ export class EdmNavigationProperty {
 export class EdmKey {
     public PropertyRef: EdmPropertyRef[] = [];
     public readXml(node: XNode) {
-        this.PropertyRef = node.selectNodes('PropertyRef').map( (x) => {
+        this.PropertyRef = node.selectNodes('PropertyRef').map((x) => {
             return XSerializer.deserialize(x, EdmPropertyRef);
         });
     }
@@ -238,10 +275,10 @@ export class EdmEntityType {
         if (keyNode) {
             this.Key = XSerializer.deserialize(keyNode, EdmKey);
         }
-        this.Property = node.selectNodes('Property').map( (x) => {
+        this.Property = node.selectNodes('Property').map((x) => {
             return XSerializer.deserialize(x, EdmProperty);
         });
-        this.NavigationProperty = node.selectNodes('NavigationProperty').map( (x) => {
+        this.NavigationProperty = node.selectNodes('NavigationProperty').map((x) => {
             return XSerializer.deserialize(x, EdmNavigationProperty);
         });
         // get implements annotation
@@ -249,10 +286,11 @@ export class EdmEntityType {
         if (implementsAnnotation) {
             this.ImplementsType = implementsAnnotation.getAttribute('String');
         }
-        this.Annotations = node.selectNodes('Annotation').map( (annotationNode) => {
+        this.Annotations = node.selectNodes('Annotation').map((annotationNode) => {
             return XSerializer.deserialize(annotationNode, EdmAnnotation);
         });
     }
+
 }
 
 /**
@@ -274,6 +312,7 @@ export class EdmEntitySet {
             this.ResourcePath = resourcePathNode.getAttribute('String');
         }
     }
+
 }
 
 export class EdmAnnotation {
