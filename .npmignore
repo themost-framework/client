@@ -38,6 +38,7 @@ tslint.json
 
 # .gitpod
 .gitpod.yml
+.gitpod.dockerfile
 
 # tmp
 .pytest_cache
