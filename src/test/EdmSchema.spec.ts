@@ -37,7 +37,7 @@ class Order extends Thing {
 }
 
 @EdmSchema.entityType()
-class Person {
+class Person extends Thing {
 
 }
 

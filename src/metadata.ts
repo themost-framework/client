@@ -1,5 +1,7 @@
 import { XDocument, XNode, XSerializer } from '@themost/xml';
 
+declare type EntityConstructor<T> = new(...args: any[]) => T;
+
 declare interface EntityTypeAnnotation {
     Entity: {
         name?: string
@@ -47,7 +49,7 @@ export class EdmSchema {
     }
 
     static entityType(name?: string) {
-        return function (target: Function) {
+        return (target: EntityConstructor<any>) => {
             // get entity type
             const entityType = target as unknown as EntityTypeAnnotation;
             // use name or target entity name
@@ -60,7 +62,7 @@ export class EdmSchema {
     }
 
     static entitySet(name: string) {
-        return function (target: Function) {
+        return (target: EntityConstructor<any>) => {
             // get entity type
             const entitySet = target as unknown as EntitySetAnnotation;
             // assign entity type annotation
