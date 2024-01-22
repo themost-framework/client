@@ -1,14 +1,14 @@
 import { XDocument, XNode, XSerializer } from '@themost/xml';
 
-declare type EntityConstructor<T> = new(...args: any[]) => T;
+export declare type EntityConstructor<T> = new(...args: any[]) => T;
 
-declare interface EntityTypeAnnotation {
+export declare interface EntityTypeAnnotation {
     Entity: {
         name?: string
     }
 }
 
-declare interface EntitySetAnnotation {
+export declare interface EntitySetAnnotation {
     EntitySet: {
         name?: string
     }
