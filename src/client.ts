@@ -5,7 +5,7 @@ import {ClientDataServiceBase, ClientDataContextBase, TextUtils, DataServiceQuer
     configurable,
     enumerable,
     DataServiceHeaders} from './common';
-import {EdmSchema} from './metadata';
+import {EdmSchema, EntityConstructor, EntitySetAnnotation, EntityTypeAnnotation} from './metadata';
 import { OpenDataQuery, OpenDataQueryFormatter, QueryFunc } from '@themost/query'
 import {SyncSeriesEventEmitter} from '@themost/events';
 
@@ -826,8 +826,23 @@ export class ClientDataModel {
 
     private readonly _name: string;
 
-    constructor(name: string, service: ClientDataServiceBase) {
-        this._name = name;
+    constructor(model: string | EntityConstructor<any>, service: ClientDataServiceBase) {
+        if (model instanceof Function) {
+            const entitySetAnnotation = model as unknown as EntitySetAnnotation;
+            if (entitySetAnnotation.EntitySet) {
+                // get entity set name as model
+                const { name } = entitySetAnnotation.EntitySet;
+                this._name = name || model.name;
+            }
+            const entityTypeAnnotation = model as unknown as EntityTypeAnnotation;
+            if (entityTypeAnnotation.Entity) {
+                // get entity type name as model
+                const { name } = entityTypeAnnotation.Entity;
+                this._name = name || model.name;
+            }
+        } else if (typeof model === 'string') {
+            this._name = model;
+        }
         Object.defineProperty(this, '_service', {
             configurable: false,
             enumerable: false,
@@ -1067,12 +1082,11 @@ export class ClientDataContext implements ClientDataContextBase {
 
     /**
      * Gets an instance of ClientDataModel class
-     * @param name {string|*} - A string which represents the name of the data model.
+     * @param model {string|*} - A string which represents the name of the data model.
      * @returns {ClientDataModel}
      */
-    public model(name: string): ClientDataModel {
-        Args.notEmpty(name, 'Model name');
-        return new ClientDataModel(name, this.service);
+    public model(model: string | EntityConstructor<any>): ClientDataModel {
+        return new ClientDataModel(model, this.service);
     }
 
     public getMetadata(force = false): Promise<EdmSchema> {
