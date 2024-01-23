@@ -18,6 +18,7 @@ module.exports = function(config) {
       require('./karma-test-api-server'),
       require("karma-jasmine"),
       require("karma-typescript"),
+      require("karma-sourcemap-loader"),
       require("karma-chrome-launcher"),
       require("karma-jasmine-html-reporter"),
       require('karma-mocha-reporter'),
