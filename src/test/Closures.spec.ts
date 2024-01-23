@@ -28,7 +28,7 @@ describe('Closures', () => {
 
     it('should use where closure and object destructuring', () => {
         const emailAddress = 'alexis.rees@example.com';
-        expect(context.model('People').where(({email}) => {
+        expect(context.model('People').where<{ email: string }>(({email}) => {
                 return email === emailAddress;
             }, {
                 emailAddress
@@ -42,7 +42,7 @@ describe('Closures', () => {
             id,
             familyName,
             givenName
-        })).where(({email}) => {
+        })).where<{ email: string }>(({email}) => {
             return email === emailAddress;
         }, {
             emailAddress
@@ -140,7 +140,7 @@ describe('Closures', () => {
         }, {
             emailAddress
         }).expand(any((x: { address: any }) => x.address)
-            .select(({id, streetAddress, addressLocalilty}) => ({
+            .select<{ id: number,streetAddress: any,addressLocalilty: any }>(({id, streetAddress, addressLocalilty}) => ({
                 id, streetAddress, addressLocalilty
             }))
             .expand((x:{ addressCountry: any }) => x.addressCountry));
