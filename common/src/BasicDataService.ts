@@ -104,6 +104,11 @@ class BasicDataService extends ClientDataService {
                     const responseError = new ResponseError(errorBody.message, error.status);
                     // assign attributes
                     Object.assign(responseError, errorBody);
+                    Object.defineProperty(responseError, 'originalError', {
+                        configurable: true,
+                        enumerable: true,
+                        value: err
+                    });
                     // and throw
                     throw responseError;
                 }
