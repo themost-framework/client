@@ -75,6 +75,22 @@ describe("BasicClientDataContext", () => {
     }
   });
 
+  it("should throw error", async () => {
+    const q = context
+      .model("People")
+      .select((x: { id: number, familyName1: string, givenName: string }) => {
+        return {
+          id: x.id,
+          familyName1: x.familyName1,
+          givenName: x.givenName
+        };
+      })
+      .where((x: { id: number, familyName: string, givenName: string }) => {
+        return x.givenName.indexOf("Chri") >= 0;
+      });
+      await expectAsync(q.getItems()).toBeRejectedWithError('SQLITE_ERROR: no such column: PersonData.familyName1');
+  });
+
   it("should use count", async () => {
     const q = context
       .model("Orders")
@@ -104,19 +120,23 @@ describe("BasicClientDataContext", () => {
     const q = context
       .model("Products")
       .asQueryable()
-      .select(({ id, name, model, price }) => ({
+      .select(({ id, name, model, price, dateCreated }) => ({
         id,
         name,
         model,
         price,
+        dateCreated
       }))
       .where((x: { model: string }) => {
         return x.model === "AC1705";
       });
-    const item: { id: number, name: string, model: string, price: number } = await q.getItem();
+    let item: { id: number, name: string, model: string, price: number, dateCreated: Date } = await q.getItem();
     expect(item).toBeTruthy();
     expect(item.id).toBeTruthy();
+    expect(item.dateCreated).toBeInstanceOf(Date);
     await context.model("Products").remove(product);
+    item = await q.getItem();
+    expect(item).toBeFalsy();
   });
 
 });
