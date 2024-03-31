@@ -79,5 +79,32 @@ module.exports = [
     plugins: [typescript({
       tsconfig: path.resolve(process.cwd(), 'common/tsconfig.lib.json')
     })]
+  },
+  {
+    input: path.resolve(process.cwd(), 'util/src/index.ts'),
+    output: {
+      dir: 'util/dist',
+      format: 'cjs',
+      sourcemap: true
+    },
+    external: Object.keys(pkg.dependencies).concat(['@themost/client', '@themost/client/common']),
+    plugins: [
+      typescript({
+        tsconfig: path.resolve(process.cwd(), 'util/tsconfig.lib.json'),
+        declaration: true,
+        declarationDir: 'util/dist/'
+      })]
+  },
+  {
+    input: 'util/src/index.ts',
+    output: {
+      file: 'util/dist/index.esm.js',
+      format: 'esm',
+      sourcemap: true
+    },
+    external: Object.keys(pkg.dependencies).concat(['@themost/client', '@themost/client/common']),
+    plugins: [typescript({
+      tsconfig: path.resolve(process.cwd(), 'util/tsconfig.lib.json')
+    })]
   }
 ];

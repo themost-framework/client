@@ -3,15 +3,19 @@
     "compilerOptions": {
         "paths": {
             "@themost/client/common": [
-                "./common/src/index"
+                "../common/src/index"
             ],
             "@themost/client": [
-                "./src/index"
+                "../src/index"
             ]
         }
     },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.d.ts"
+    ],
     "exclude": [
         "node_modules",
-        "src/test"
+        "spec"
     ]
 }

@@ -40,16 +40,10 @@ const EdmTypeMap = new Map([
     ]
 ]);
 
-function orderByName(a: { Name: string}, b: { Name: string }) {
-    if (a.Name < b.Name) return -1;
-    if (a.Name > b.Name) return 1;
-    return 0;
-}
-
 class TypeRenderer {
 
-    private context: BasicDataContext;
-    private schema: EdmSchema;
+    protected context: BasicDataContext;
+    protected schema: EdmSchema;
 
     /**
      * @param {string} host 
@@ -112,8 +106,11 @@ class TypeRenderer {
         const result = `
 export interface ${entityType.Name} ${extendsInterface}{
 ${properties.sort(
-    (a, b) => orderByName(a, b)
-        ).map((property) => `\t${property.Declaration}`).join('\n')}
+    (a, b) => {
+        if (a.Name < b.Name) return -1;
+        if (a.Name > b.Name) return 1;
+        return 0;
+    }).map((property) => `\t${property.Declaration}`).join('\n')}
 }`
         return result.replace(/(\n+)/g, '\n');
     }
@@ -126,7 +123,13 @@ ${properties.sort(
 
     async renderAny() {
         this.schema = await this.context.getMetadata();
-        const typeDeclarations = this.schema.EntityType.map((entityType) => this.renderType(entityType));
+        const typeDeclarations = this.schema.EntityType.sort(
+            (a, b) => {
+                if (a.Name < b.Name) return -1;
+                if (a.Name > b.Name) return 1;
+                return 0;
+            }
+        ).map((entityType) => this.renderType(entityType));
         return typeDeclarations.join('\n');
     }
 
