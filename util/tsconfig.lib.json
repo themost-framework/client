@@ -1,0 +1,17 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "paths": {
+            "@themost/client/common": [
+                "./common/src/index"
+            ],
+            "@themost/client": [
+                "./src/index"
+            ]
+        }
+    },
+    "exclude": [
+        "node_modules",
+        "src/test"
+    ]
+}
