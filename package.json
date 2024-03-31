@@ -1,10 +1,13 @@
 {
   "name": "@themost/client",
-  "version": "2.13.0",
+  "version": "2.14.0",
   "description": "MOST Web Framework Codename Blueshift - Client Common",
   "module": "dist/index.esm.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "client-cli": "util/bin/cli.js"
+  },
   "scripts": {
     "build": "rimraf dist && rimraf common/dist && rollup -c ./rollup.config.js -m",
     "watch": "rimraf dist && rimraf common/dist && rollup -c ./rollup.config.js -m -w",
@@ -29,12 +32,14 @@
     "@themost/query": "^2.11.2",
     "@themost/xml": "^2.5.1",
     "buffer": "^6.0.3",
+    "minimist": "^1.2.8",
     "superagent": "^8.1.2"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.1",
-    "@themost/test": "^2.3.4",
+    "@themost/test": "^2.4.0",
     "@types/jasmine": "^3.10.0",
+    "@types/minimist": "^1.2.5",
     "@types/node": "^16.11.4",
     "@types/superagent": "^8.1.1",
     "@typescript-eslint/eslint-plugin": "^6.13.1",
@@ -44,6 +49,7 @@
     "dotenv": "^16.3.1",
     "eslint": "^8.54.0",
     "eslint-plugin-jsdoc": "^46.9.0",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "jasmine": "^4.5.0",
     "jasmine-spec-reporter": "^7.0.0",
