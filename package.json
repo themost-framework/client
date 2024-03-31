@@ -5,6 +5,9 @@
   "module": "dist/index.esm.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "client-cli": "util/bin/cli.js"
+  },
   "scripts": {
     "build": "rimraf dist && rimraf common/dist && rollup -c ./rollup.config.js -m",
     "watch": "rimraf dist && rimraf common/dist && rollup -c ./rollup.config.js -m -w",
