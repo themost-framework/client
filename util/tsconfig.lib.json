@@ -3,10 +3,10 @@
     "compilerOptions": {
         "paths": {
             "@themost/client/common": [
-                "../common/src/index"
+                "../common"
             ],
             "@themost/client": [
-                "../src/index"
+                ".."
             ]
         }
     },
