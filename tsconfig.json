@@ -17,6 +17,9 @@
             "ES2017"
         ],
         "paths": {
+            "@themost/client/util": [
+                "./util/src/index"
+            ],
             "@themost/client/common": [
                 "./common/src/index"
             ],
