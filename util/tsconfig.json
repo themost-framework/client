@@ -18,13 +18,13 @@
         ],
         "paths": {
             "@themost/client/util": [
-                "./util/src/index"
+                "./src/index"
             ],
             "@themost/client/common": [
-                "./common/src/index"
+                "../common/src/index"
             ],
             "@themost/client": [
-                "./src/index"
+                "../src/index"
             ]
         }
     },
