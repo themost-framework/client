@@ -1,4 +1,5 @@
-import { EdmSchema } from '@themost/client';
+import {EdmSchema} from '@themost/client';
+import {TestContext} from './TestUtils';
 
 class Thing {
     id?: number;
@@ -42,6 +43,13 @@ class Person extends Thing {
 }
 
 describe('EdmSchema', () => {
+
+    let context: TestContext;
+    beforeAll(async () => {
+        context = new TestContext();
+        await context.authenticate();
+    });
+
     it('should define entity set annotation', () => {
         const annotation = Product as unknown as {
             EntitySet: {
@@ -70,5 +78,11 @@ describe('EdmSchema', () => {
         }
         expect(annotation.Entity).toBeTruthy();
         expect(annotation.Entity.name).toEqual('Person');
+    });
+
+    it('should get items by using class', async () => {
+        const items = await context.model(Product).where<Product>((x) => x.category === 'Laptops').getItems();
+        expect(items).toBeTruthy();
+        expect(items.length).toBeTruthy();
     });
 });
