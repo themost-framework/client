@@ -1,5 +1,6 @@
+#!/usr/bin/env node
 const minimist = require('minimist');
-const { TypeRenderer } = require('../dist');
+const { TypeRenderer, FileSchemaRenderer } = require('../dist');
 const { writeFileSync } = require('fs');
 
 async function main() {
@@ -9,17 +10,18 @@ async function main() {
         },
     });
     if (args.help) {
-        console.log('Usage: client-cli [options]');
+        console.log('Usage: client-cli <source> [options]');
         console.log('Options:');
-        console.log('  --host <host>  The HTTP address of the host api server to connect to');
-        console.log('  --out-file <file>  The output file to write the rendered types to');
+        console.log('  --out-file <output>  The output file to write the rendered types to');
         return;
     }
-    if (!args.host) {
-        console.error('Error: Missing required argument --host');
+    const source = args._[0];
+    if (!source) {
+        console.error('Missing argument: A source metadata file or a valid URL must be provided');
         return process.exit(-1);
     }
-    const typeRenderer = new TypeRenderer(args.host);
+    const isURL = source.startsWith('http://') || source.startsWith('https://');
+    const typeRenderer = isURL ? new TypeRenderer(source) : new FileSchemaRenderer(source);
     const result = await typeRenderer.renderAny();
     if (args.outFile) {
         writeFileSync(args.outFile, result);

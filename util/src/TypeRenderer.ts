@@ -1,5 +1,6 @@
 import {EdmEntityType, EdmNavigationProperty, EdmProperty, EdmSchema} from '@themost/client';
 import {BasicDataContext} from '@themost/client/common';
+import { readFile } from 'fs';
 
 const EdmTypeMap = new Map([
     [
@@ -48,7 +49,7 @@ class TypeRenderer {
     /**
      * @param {string} host 
      */
-    constructor(host: string) {
+    constructor(host?: string) {
         this.context = new BasicDataContext(host);
     }
 
@@ -116,13 +117,21 @@ ${properties.sort(
     }
 
     async render(type: string) {
-        this.schema = await this.context.getMetadata();
+        if (this.schema == null) {
+            this.schema = await this.getSchema();
+        }
         const entityType = this.schema.EntityType.find((t) => t.Name === type);
         return this.renderType(entityType)
     }
 
+    protected getSchema(): Promise<EdmSchema> {
+        return this.context.getMetadata();
+    }
+
     async renderAny() {
-        this.schema = await this.context.getMetadata();
+        if (this.schema == null) {
+            this.schema = await this.getSchema();
+        }
         const typeDeclarations = this.schema.EntityType.sort(
             (a, b) => {
                 if (a.Name < b.Name) return -1;
@@ -132,7 +141,32 @@ ${properties.sort(
         ).map((entityType) => this.renderType(entityType));
         return typeDeclarations.join('\n');
     }
+}
+
+class FileSchemaRenderer extends TypeRenderer {
+    constructor(private file: string) {
+        super();
+    }
+
+    protected getSchema(): Promise<EdmSchema> {
+        return new Promise((resolve, reject) => {
+            void readFile(this.file, 'utf8', (err, data) => {
+               if (err) {
+                   return reject(err);
+               }
+               try {
+                   const schema = EdmSchema.loadXML(data);
+                   return resolve(schema);
+               } catch (e) {
+                   return reject(e);
+               }
+            });
+        });
+    }
 
 }
 
-export { TypeRenderer }
+export {
+    TypeRenderer,
+    FileSchemaRenderer
+}
