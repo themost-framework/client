@@ -1,15 +1,10 @@
-import {TypeRenderer} from '@themost/client/util';
-import { serveApplication, getApplication } from '@themost/test';
+import {FileSchemaRenderer, TypeRenderer} from '@themost/client/util';
+import { resolve } from 'path';
 
-describe("TypeRenderer", () => {
-
-    beforeAll(async () => {
-        const app = await getApplication();
-        await serveApplication(app, 8080)
-    });
+describe("FileSchemaRenderer(", () => {
 
     it("should render type", async () => {
-        const renderer = new TypeRenderer('http://localhost:8080/api/');
+        const renderer = new FileSchemaRenderer(resolve(__dirname, 'metadata.xml'));
         let typeDeclaration = await renderer.render('Thing');
         expect(typeDeclaration).toBeInstanceOf(String);
         typeDeclaration = await renderer.render('Workspace');
@@ -17,7 +12,7 @@ describe("TypeRenderer", () => {
     });
 
     it("should render any type", async () => {
-        const renderer = new TypeRenderer('http://localhost:8080/api/');
+        const renderer = new FileSchemaRenderer(resolve(__dirname, 'metadata.xml'));
         const typeDeclarations = await renderer.renderAny();
         expect(typeDeclarations).toBeInstanceOf(String);
     });

@@ -654,3 +654,23 @@ or use query expressions for applying nested query options:
         ).getItems();
 
 > `/People?$expand=address($select=id,streetAddress,addressLocalilty;$expand=addressCountry)`
+
+## Using CLI
+
+`@themost/client` provides a command line interface for generating client-side type declarations from an OData metadata service.
+
+Connect to an OData service and generate client-side type declarations:
+
+```bash
+$ npx @themost/client http://localhost:3000/api/
+```
+or extract metadata from an OData metadata document:
+
+```bash
+$ npx @themost/client ./metadata.xml
+```
+Use `--out-file` option for specifying the output file:
+
+```bash
+$ npx @themost/client http://localhost:3000/api/ --out-file ./client.d.ts
+```
