@@ -22,6 +22,12 @@ describe("TypeRenderer", () => {
         expect(typeDeclarations).toBeInstanceOf(String);
     });
 
-
+    it("should render any type as class", async () => {
+        const renderer = new TypeRenderer('http://localhost:8080/api/', {
+            classes: true
+        });
+        const typeDeclarations = await renderer.renderAny();
+        expect(typeDeclarations).toBeInstanceOf(String);
+    });
 
 });
