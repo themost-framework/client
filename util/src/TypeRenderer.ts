@@ -52,7 +52,7 @@ class TypeRenderer {
     protected context: BasicDataContext;
     protected schema: EdmSchema;
 
-    constructor(host?: string, private options?: {
+    constructor(host?: string, protected options?: {
         classes: boolean
     }) {
         this.context = new BasicDataContext(host);
@@ -153,12 +153,45 @@ class TypeRenderer {
         if (this.schema == null) {
             this.schema = await this.getSchema();
         }
-        const typeDeclarations = this.schema.EntityType.sort(
-            (a, b) => {
-                if (a.Name < b.Name) return -1;
-                if (a.Name > b.Name) return 1;
-                return 0;
+
+        const sort = (a: string, b: string) => {
+            if (a < b) return -1;
+            if (a > b) return 1;
+            return 0;
+        }
+
+        // sort entity types
+        const withoutBaseType = this.schema.EntityType
+            .filter((t) => t.BaseType == null)
+            .map((t) => t.Name)
+            .sort((a, b) => sort(a, b));
+
+        const names = [];
+        names.push(...withoutBaseType);
+        const withBaseType = this.schema.EntityType
+            .filter((t) => t.BaseType != null)
+            .map((t) => t.Name)
+            .sort((a, b) => sort(a, b));
+        // sort entity types with base type and find base type path e.g. Action/RequestAction/StudentRequestAction
+        const withTypes = withBaseType.map((t) => {
+            let entityType = this.schema.EntityType.find((e) => e.Name === t)
+            let baseType = entityType.BaseType;
+            let types = [
+                t
+            ];
+            while (baseType) {
+                types.push(baseType);
+                entityType = this.schema.EntityType.find((e) => e.Name === baseType);
+                baseType = entityType ? entityType.BaseType : null;
             }
+            return {
+                Name: t,
+                Types: types.reverse().join('/')
+            }
+        }).sort((a, b) => sort(a.Types, b.Types)).map((t) => t.Name);
+        names.push(...withTypes);
+        const typeDeclarations = names.map(
+            (name: string) => this.schema.EntityType.find((t) => t.Name === name)
         ).map((entityType) => this.renderType(entityType));
         let result = '';
         if (this.options && this.options.classes) {
@@ -172,8 +205,11 @@ class TypeRenderer {
 }
 
 class FileSchemaRenderer extends TypeRenderer {
-    constructor(private file: string) {
+    constructor(private file: string, options?: {
+        classes: boolean
+    }) {
         super();
+        this.options = options;
     }
 
     protected getSchema(): Promise<EdmSchema> {
