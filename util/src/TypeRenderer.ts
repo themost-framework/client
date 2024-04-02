@@ -41,15 +41,20 @@ const EdmTypeMap = new Map([
     ]
 ]);
 
+const Space = ' ';
+const OpeningBracket = '{';
+const ClosingBracket = '}';
+const NewLine = '\n';
+const Tab = '\t';
+
 class TypeRenderer {
 
     protected context: BasicDataContext;
     protected schema: EdmSchema;
 
-    /**
-     * @param {string} host 
-     */
-    constructor(host?: string) {
+    constructor(host?: string, protected options?: {
+        classes: boolean
+    }) {
         this.context = new BasicDataContext(host);
     }
 
@@ -87,7 +92,6 @@ class TypeRenderer {
      * @returns string
      */
     protected renderType(entityType: EdmEntityType) {
-        const extendsInterface = entityType.BaseType ? ` extends ${entityType.BaseType} ` : '';
         const properties = entityType.Property.map((property) => {
             const { Name } = property;
             const Declaration = this.renderProperty(property);
@@ -104,15 +108,32 @@ class TypeRenderer {
                 Declaration
             }
         }));
-        const result = `
-export interface ${entityType.Name} ${extendsInterface}{
-${properties.sort(
-    (a, b) => {
-        if (a.Name < b.Name) return -1;
-        if (a.Name > b.Name) return 1;
-        return 0;
-    }).map((property) => `\t${property.Declaration}`).join('\n')}
-}`
+        let result = '';
+        if (this.options && this.options.classes) {
+            // find entity set and define annotation
+            const entitySet = this.schema.EntityContainer.EntitySet.find((s) => s.EntityType === entityType.Name);
+            if (entitySet) {
+                result += `@EdmSchema.entitySet('${entitySet.Name}')`;
+                result += NewLine;
+            }
+        }
+        result += 'export';
+        result += Space;
+        result += this.options && this.options.classes ? 'class' : 'interface';
+        result += Space;
+        result += entityType.Name;
+        result += Space;
+        result += entityType.BaseType ? `extends ${entityType.BaseType}` : '';
+        result += Space;
+        result += OpeningBracket;
+        result += NewLine;
+        result += properties.sort((a, b) => {
+                if (a.Name < b.Name) return -1;
+                if (a.Name > b.Name) return 1;
+                return 0;
+            }).map((property) => Tab + `${property.Declaration}`).join(NewLine);
+        result += NewLine;
+        result += ClosingBracket;
         return result.replace(/(\n+)/g, '\n');
     }
 
@@ -132,20 +153,63 @@ ${properties.sort(
         if (this.schema == null) {
             this.schema = await this.getSchema();
         }
-        const typeDeclarations = this.schema.EntityType.sort(
-            (a, b) => {
-                if (a.Name < b.Name) return -1;
-                if (a.Name > b.Name) return 1;
-                return 0;
+
+        const sort = (a: string, b: string) => {
+            if (a < b) return -1;
+            if (a > b) return 1;
+            return 0;
+        }
+
+        // sort entity types
+        const withoutBaseType = this.schema.EntityType
+            .filter((t) => t.BaseType == null)
+            .map((t) => t.Name)
+            .sort((a, b) => sort(a, b));
+
+        const names = [];
+        names.push(...withoutBaseType);
+        const withBaseType = this.schema.EntityType
+            .filter((t) => t.BaseType != null)
+            .map((t) => t.Name)
+            .sort((a, b) => sort(a, b));
+        // sort entity types with base type and find base type path e.g. Action/RequestAction/StudentRequestAction
+        const withTypes = withBaseType.map((t) => {
+            let entityType = this.schema.EntityType.find((e) => e.Name === t)
+            let baseType = entityType.BaseType;
+            let types = [
+                t
+            ];
+            while (baseType) {
+                types.push(baseType);
+                entityType = this.schema.EntityType.find((e) => e.Name === baseType);
+                baseType = entityType ? entityType.BaseType : null;
             }
+            return {
+                Name: t,
+                Types: types.reverse().join('/')
+            }
+        }).sort((a, b) => sort(a.Types, b.Types)).map((t) => t.Name);
+        names.push(...withTypes);
+        const typeDeclarations = names.map(
+            (name: string) => this.schema.EntityType.find((t) => t.Name === name)
         ).map((entityType) => this.renderType(entityType));
-        return typeDeclarations.join('\n');
+        let result = '';
+        if (this.options && this.options.classes) {
+            result += 'import { EdmSchema } from \'@themost/client\';';
+            result += NewLine;
+            result += NewLine;
+        }
+        result += typeDeclarations.join(NewLine + NewLine);
+        return result;
     }
 }
 
 class FileSchemaRenderer extends TypeRenderer {
-    constructor(private file: string) {
+    constructor(private file: string, options?: {
+        classes: boolean
+    }) {
         super();
+        this.options = options;
     }
 
     protected getSchema(): Promise<EdmSchema> {

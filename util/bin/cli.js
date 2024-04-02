@@ -13,6 +13,7 @@ async function main() {
         console.log('Usage: client-cli <source> [options]');
         console.log('Options:');
         console.log('  --out-file <output>  The output file to write the rendered types to');
+        console.log('  --classes Render classes instead of interfaces');
         return;
     }
     const source = args._[0];
@@ -21,7 +22,10 @@ async function main() {
         return process.exit(-1);
     }
     const isURL = source.startsWith('http://') || source.startsWith('https://');
-    const typeRenderer = isURL ? new TypeRenderer(source) : new FileSchemaRenderer(source);
+    const options = {
+        classes: args.classes
+    };
+    const typeRenderer = isURL ? new TypeRenderer(source, options) : new FileSchemaRenderer(source, options);
     const result = await typeRenderer.renderAny();
     if (args.outFile) {
         writeFileSync(args.outFile, result);
