@@ -33,7 +33,7 @@
     "@themost/xml": "^2.5.1",
     "buffer": "^6.0.3",
     "minimist": "^1.2.8",
-    "superagent": "^8.1.2"
+    "superagent": "^9.0.1"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.1",
