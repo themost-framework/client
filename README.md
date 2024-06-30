@@ -130,6 +130,32 @@ Define `$filter` system query option by using a javascript closure:
 
 > `/Orders?$filter=orderStatus/alternateName eq 'OrderPickup'&$top=10`
 
+#### Using parameters
+
+A query expression can accept parameters as additional arguments. The following example demonstrates how to use parameters in a query expression e.g.
+
+```javascript
+const items = await context.model('Orders')
+    .asQueryable()
+    .where((x, orderStatus) => {
+        return x.orderStatus.alternateName === orderStatus;
+    }, 'OrderPickup').take(10)
+    .getItems();
+```
+where the first parameter is a query closure and the second parameter is a string value which is going to be passed to closure as `orderStatus` argument.
+
+```javascript
+const items = await context.model('Orders')
+    .asQueryable()
+    .where((x, orderStatus, productCategory) => {
+        return x.orderStatus.alternateName === orderStatus &&
+            x.orderedItem.category === productCategory;
+    }, 'OrderPickup', 'Desktops').take(10)
+    .getItems();
+```
+
+
+
 #### Logical Operators
 
 Use logical operators while querying data:

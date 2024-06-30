@@ -1,7 +1,7 @@
 import { any, count } from '@themost/query';
 import {ClientDataContext, ClientDataQueryable, ClientDataService, DataServiceQueryParams, ParserDataService} from '@themost/client';
 
-fdescribe('Closures', () => {
+describe('Closures', () => {
     let service: ClientDataService;
     let context: ClientDataContext;
     beforeEach(() => {
@@ -25,6 +25,16 @@ fdescribe('Closures', () => {
                 email
             })
             .toString()).toEqual('/People?$filter=email eq \'alexis.rees@example.com\'');
+    });
+
+    it('should pass parameters by value', () => {
+        const q = context.model('Orders')
+            .asQueryable()
+            .where((x: { orderStatus: { alternateName: string }, orderedItem: { category: string } }, orderStatus: string, productCategory: string) => {
+                return x.orderStatus.alternateName === orderStatus &&
+                    x.orderedItem.category === productCategory;
+            }, 'OrderPickup', 'Desktops').take(10);
+        expect(q.toString()).toEqual('/Orders?$filter=(orderStatus/alternateName eq \'OrderPickup\' and orderedItem/category eq \'Desktops\')&$top=10');
     });
 
     it('should use where closure and object destructuring', () => {
