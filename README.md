@@ -95,7 +95,7 @@ Read OData v4 specification for more information about system query options:
 
 http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#_Toc31360955
 
-### select(expr: QueryFunc<T>, params?: any)
+### select(expr: QueryFunc<T>, ...params: any[])
 
 Define `$select` system query option by using a javascript closure:
 
@@ -117,7 +117,7 @@ Define `$select` system query option by using a javascript closure:
 
 > `/Orders?$select=id,customer/description as customer,orderDate,orderedItem/name as product&$filter=paymentMethod/alternateName eq 'DirectDebit'&$orderby=orderDate desc&$top=10`
 
-### where(expr: QueryFunc<T>, params?: any)
+### where(expr: QueryFunc<T>, ...params: any[])
 
 Define `$filter` system query option by using a javascript closure:
 
@@ -125,12 +125,36 @@ Define `$filter` system query option by using a javascript closure:
         .asQueryable()
         .where((x, orderStatus) => {
             return x.orderStatus.alternateName === orderStatus;
-        }, {
-            orderStatus: 'OrderPickup'
-        }).take(10)
+        }, 'OrderPickup').take(10)
         .getItems();
 
 > `/Orders?$filter=orderStatus/alternateName eq 'OrderPickup'&$top=10`
+
+#### Using parameters
+
+A query expression can accept parameters as additional arguments. The following example demonstrates how to use parameters in a query expression e.g.
+
+```javascript
+const items = await context.model('Orders')
+    .asQueryable()
+    .where((x, orderStatus) => {
+        return x.orderStatus.alternateName === orderStatus;
+    }, 'OrderPickup').take(10)
+    .getItems();
+```
+where the first parameter is a query closure and the second parameter is a string value which is going to be passed to closure as `orderStatus` argument.
+
+```javascript
+const items = await context.model('Orders')
+    .asQueryable()
+    .where((x, orderStatus, productCategory) => {
+        return x.orderStatus.alternateName === orderStatus &&
+            x.orderedItem.category === productCategory;
+    }, 'OrderPickup', 'Desktops').take(10)
+    .getItems();
+```
+
+
 
 #### Logical Operators
 
@@ -539,9 +563,7 @@ Set `$top` system query option for defining the number of records to be taken
         .asQueryable()
         .where((x, orderStatus) => {
             return x.orderStatus.alternateName === orderStatus;
-        }, {
-            orderStatus: 'OrderPickup'
-        }).take(10)
+        }, 'OrderPickup').take(10)
         .getItems();
 
 > `/Orders?$filter=orderStatus/alternateName eq 'OrderPickup'&$top=10`
@@ -554,15 +576,13 @@ Set `$skip` system query option for defining the number of records to be skipped
         .asQueryable()
         .where((x, orderStatus) => {
             return x.orderStatus.alternateName === orderStatus;
-        }, {
-            orderStatus: 'OrderPickup'
-        }).take(25)
+        }, 'OrderPickup').take(25)
         .skip(25)
         .getItems();
 
 > `/Orders?$filter=orderStatus/alternateName eq 'OrderPickup'&$top=25&$skip=25`
 
-### orderBy(expr: QueryFunc<T>, params?: any)
+### orderBy(expr: QueryFunc<T>, ...params: any[])
 
 Define `$orderby` system query option for sorting records
 
@@ -573,7 +593,7 @@ Define `$orderby` system query option for sorting records
 
 > `/People?$orderby=familyName`
 
-### thenBy(expr: QueryFunc<T>, params?: any)
+### thenBy(expr: QueryFunc<T>, ...params: any[])
 
     const items = await context.model('People')
         .asQueryable()
@@ -583,7 +603,7 @@ Define `$orderby` system query option for sorting records
 
 > `/People?$orderby=familyName,givenName`
 
-### orderByDescending(expr: QueryFunc<T>, params?: any)
+### orderByDescending(expr: QueryFunc<T>, ...params: any[])
 
     const items = await context.model('People')
         .asQueryable()
@@ -592,7 +612,7 @@ Define `$orderby` system query option for sorting records
 
 > `/People?$orderby=familyName desc`
 
-### thenByDescending(expr: QueryFunc<T>, params?: any)
+### thenByDescending(expr: QueryFunc<T>, ...params: any[])
 
     const items = await context.model('People')
         .asQueryable()

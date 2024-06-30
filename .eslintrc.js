@@ -99,6 +99,7 @@ module.exports = {
         ],
         "@typescript-eslint/typedef": "off",
         "@typescript-eslint/unified-signatures": "error",
+        "@typescript-eslint/no-unsafe-member-access": "off",
         "complexity": "off",
         "constructor-super": "error",
         "dot-notation": "off",
