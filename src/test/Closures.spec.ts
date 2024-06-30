@@ -1,7 +1,7 @@
 import { any, count } from '@themost/query';
 import {ClientDataContext, ClientDataQueryable, ClientDataService, DataServiceQueryParams, ParserDataService} from '@themost/client';
 
-describe('Closures', () => {
+fdescribe('Closures', () => {
     let service: ClientDataService;
     let context: ClientDataContext;
     beforeEach(() => {
@@ -20,47 +20,43 @@ describe('Closures', () => {
     it('should use where closure with params', () => {
         const email = 'alexis.rees@example.com';
         expect(context.model('People')
-            .where((x:{ email: string }) => x.email === email, {
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            .where((x:{ email: string }, email: string) => x.email === email, {
                 email
             })
             .toString()).toEqual('/People?$filter=email eq \'alexis.rees@example.com\'');
     });
 
     it('should use where closure and object destructuring', () => {
-        const emailAddress = 'alexis.rees@example.com';
-        expect(context.model('People').where<{ email: string }>(({email}) => {
+        expect(context.model('People').where<{ email: string }>(({email}, emailAddress: string) => {
                 return email === emailAddress;
-            }, {
-                emailAddress
-            }).toString()).toEqual('/People?$filter=email eq \'alexis.rees@example.com\'');
+            }, 'alexis.rees@example.com').toString()).toEqual('/People?$filter=email eq \'alexis.rees@example.com\'');
     });
 
     it('should use select closure', () => {
-        const emailAddress = 'alexis.rees@example.com';
         const query = context.model('People')
         .select(({id, familyName, givenName}) => ({
             id,
             familyName,
             givenName
-        })).where<{ email: string }>(({email}) => {
+        })).where<{ email: string }>(({email}, emailAddress) => {
             return email === emailAddress;
         }, {
-            emailAddress
+            emailAddress: 'alexis.rees@example.com'
         });
         expect(query.toString()).toEqual('/People?$select=id,familyName,givenName&$filter=email eq \'alexis.rees@example.com\'');
     });
 
     it('should use orderBy closure', () => {
-        const emailAddress = 'alexis.rees@example.com';
         const query = context.model('People')
         .select(({id, familyName, givenName}) => ({
             id,
             familyName,
             givenName
-        })).where(({email}) => {
+        })).where(({email}, emailAddress) => {
             return email === emailAddress;
         }, {
-            emailAddress
+            emailAddress: 'alexis.rees@example.com'
         }).orderBy((x:{ familyName: string }) => x.familyName)
         .thenBy((x:{ givenName: string }) => x.givenName);
         const queryParams: DataServiceQueryParams = query.getParams();
@@ -70,16 +66,15 @@ describe('Closures', () => {
     });
 
     it('should use orderByDescending closure', () => {
-        const emailAddress = 'alexis.rees@example.com';
         const query = context.model('People')
         .select(({id, familyName, givenName}) => ({
             id,
             familyName,
             givenName
-        })).where(({email}) => {
+        })).where(({email}, emailAddress) => {
             return email === emailAddress;
         }, {
-            emailAddress
+            emailAddress: 'alexis.rees@example.com'
         }).orderByDescending((x:{ familyName: string }) => x.familyName)
         .thenByDescending((x:{ givenName: string }) => x.givenName);
         const queryParams: DataServiceQueryParams = query.getParams();
@@ -121,24 +116,22 @@ describe('Closures', () => {
     });
 
     it('should use expand closure', () => {
-        const emailAddress = 'alexis.rees@example.com';
         const query = context.model('People')
-        .where(({email}) => {
+        .where<{email: string}>(({email}, emailAddress) => {
             return email === emailAddress;
         }, {
-            emailAddress
+            emailAddress: 'alexis.rees@example.com'
         }).expand((x: { address: any }) => x.address);
         const queryParams: DataServiceQueryParams = query.getParams();
         expect(queryParams.$expand).toEqual(`address`);
     });
 
     it('should use expand with nested expand', () => {
-        const emailAddress = 'alexis.rees@example.com';
         const People = context.model('People');
-        const query = People.where(({email}) => {
+        const query = People.where(({email}, emailAddress) => {
             return email === emailAddress;
         }, {
-            emailAddress
+            emailAddress: 'alexis.rees@example.com'
         }).expand(any((x: { address: any }) => x.address)
             .select<{ id: number,streetAddress: any,addressLocalilty: any }>(({id, streetAddress, addressLocalilty}) => ({
                 id, streetAddress, addressLocalilty

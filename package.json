@@ -29,7 +29,7 @@
   "dependencies": {
     "@themost/events": "^1.1.0",
     "@themost/json": "^1.0.1",
-    "@themost/query": "^2.11.2",
+    "@themost/query": "^2.12.0",
     "@themost/xml": "^2.5.1",
     "buffer": "^6.0.3",
     "minimist": "^1.2.8",
