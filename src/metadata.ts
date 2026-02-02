@@ -14,6 +14,11 @@ export declare interface EntitySetAnnotation {
     }
 }
 
+export declare  interface NameWithNamespace {
+    Name: string;
+    FullyQualifiedName: string;
+}
+
 /**
  * Represents an OData service metadata document
  */
@@ -28,11 +33,56 @@ export class EdmSchema {
         return XSerializer.deserialize(schemaElement, EdmSchema);
     }
 
+    public static isPrimitiveType(typeName: string): boolean {
+        return /^Edm\.\w+$/.test(typeName) || /^Collection\(Edm\.\w+\)$/.test(typeName);
+    }
+
+    public static isCollectionOf(typeName: string): string {
+        const matches = /^Collection\(((\w+\.?)+)\)$/.exec(typeName);
+        if (matches) {
+            return matches[1];
+        }
+        return null;
+    }
+
+    public static hasNameWithNamespace(typeName: string): NameWithNamespace {
+        if (typeName == null) {
+            return null;
+        }
+        if (EdmSchema.isPrimitiveType(typeName)) {
+            return null;
+        }
+        // check for collection type
+        const collectionTypeName = EdmSchema.isCollectionOf(typeName);
+        // if collection type
+        if (collectionTypeName) {
+            // check for type name with namespace
+            const collectionNameWithNamespace = EdmSchema.hasNameWithNamespace(collectionTypeName);
+            if (collectionNameWithNamespace) {
+                return {
+                    Name: `Collection(${collectionNameWithNamespace.Name})`,
+                    FullyQualifiedName: `Collection(${collectionNameWithNamespace.FullyQualifiedName})`
+                };
+            }
+            return null;
+        }
+        const parts = typeName.split('.');
+        if (parts.length > 1) {
+            return {
+                Name: parts[parts.length - 1],
+                FullyQualifiedName: typeName
+            };
+        }
+        return null;
+    }
+
+    public Namespace: string;
     public EntityType: EdmEntityType[] = [];
     public EntityContainer = new EdmEntityContainer();
     public Action: EdmAction[] = [];
     public Function: EdmFunction[] = [];
     public readXml(node: XNode) {
+        this.Namespace = node.getAttribute('Namespace');
         this.EntityType = node.selectNodes('EntityType').map((x) => {
             return XSerializer.deserialize(x, EdmEntityType);
         });
@@ -126,10 +176,13 @@ export class EdmAction extends EdmProcedure {
 export class EdmParameter {
     public Name: string;
     public Type: string;
+    public TypeName?: NameWithNamespace;
     public Nullable = true;
     public readXml(node: XNode) {
         this.Name = node.getAttribute('Name');
         this.Type = node.getAttribute('Type');
+        this.TypeName = EdmSchema.hasNameWithNamespace(this.Type);
+        if (this.TypeName) { this.Type = this.TypeName.Name; }
         if (node.hasAttribute('Nullable')) {
             this.Nullable = node.getAttribute('Nullable') === 'true';
         }
@@ -141,9 +194,12 @@ export class EdmParameter {
  */
 export class EdmReturnType {
     public Type: string;
+    public TypeName?: NameWithNamespace;
     public Nullable = true;
     public readXml(node: XNode) {
         this.Type = node.getAttribute('Type');
+        this.TypeName = EdmSchema.hasNameWithNamespace(this.Type);
+        if (this.TypeName) { this.Type = this.TypeName.Name; }
         if (node.hasAttribute('Nullable')) {
             this.Nullable = node.getAttribute('Nullable') === 'true';
         }
@@ -156,6 +212,7 @@ export class EdmReturnType {
 export class EdmProperty {
     public Name: string;
     public Type: string;
+    public TypeName?: NameWithNamespace;
     public Nullable = true;
     public Immutable = false;
     public Description: string;
@@ -165,9 +222,12 @@ export class EdmProperty {
     constructor() {
         //
     }
+
     public readXml(node: XNode) {
         this.Name = node.getAttribute('Name');
         this.Type = node.getAttribute('Type');
+        this.TypeName = EdmSchema.hasNameWithNamespace(this.Type);
+        if (this.TypeName) { this.Type = this.TypeName.Name; }
         if (node.hasAttribute('Nullable')) {
             this.Nullable = node.getAttribute('Nullable') === 'true';
         }
@@ -199,6 +259,7 @@ export class EdmProperty {
 export class EdmNavigationProperty {
     public Name: string;
     public Type: string;
+    public TypeName?: NameWithNamespace;
     public Immutable = false;
     public Description: string;
     public LongDescription: string;
@@ -210,6 +271,8 @@ export class EdmNavigationProperty {
     public readXml(node: XNode) {
         this.Name = node.getAttribute('Name');
         this.Type = node.getAttribute('Type');
+        this.TypeName = EdmSchema.hasNameWithNamespace(this.Type);
+        if (this.TypeName) { this.Type = this.TypeName.Name; }
         const immutable = node.selectSingleNode('Annotation[@Term="Org.OData.Core.V1.Immutable"]');
         if (immutable) {
             this.Immutable = (immutable.getAttribute('Tag') === 'true') || (immutable.getAttribute('Bool') === 'true');
@@ -260,6 +323,7 @@ export class EdmPropertyRef {
 export class EdmEntityType {
     public Name: string;
     public BaseType: string;
+    public BaseTypeName?: NameWithNamespace;
     public OpenType: boolean;
     public Key: EdmKey;
     public Property: EdmProperty[] = [];
@@ -273,6 +337,8 @@ export class EdmEntityType {
         this.Name = node.getAttribute('Name');
         this.OpenType = node.getAttribute('OpenType') === 'true';
         this.BaseType = node.getAttribute('BaseType');
+        this.BaseTypeName = EdmSchema.hasNameWithNamespace(this.BaseType);
+        if (this.BaseTypeName) { this.BaseType = this.BaseTypeName.Name; }
         const keyNode = node.selectSingleNode('Key');
         if (keyNode) {
             this.Key = XSerializer.deserialize(keyNode, EdmKey);
@@ -301,6 +367,7 @@ export class EdmEntityType {
 export class EdmEntitySet {
     public Name: string;
     public EntityType: string;
+    public EntityTypeName?: NameWithNamespace;
     public ResourcePath: string;
     constructor() {
         //
@@ -308,6 +375,8 @@ export class EdmEntitySet {
     public readXml(node: XNode) {
         this.Name = node.getAttribute('Name');
         this.EntityType = node.getAttribute('EntityType');
+        this.EntityTypeName = EdmSchema.hasNameWithNamespace(this.EntityType);
+        if (this.EntityTypeName) { this.EntityType = this.EntityTypeName.Name; }
         // get resource path
         const resourcePathNode = node.selectSingleNode('Annotation[@Term="Org.OData.Core.V1.ResourcePath"]');
         if (resourcePathNode) {

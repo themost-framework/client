@@ -60,6 +60,76 @@ describe('EdmSchema', () => {
         expect(annotation.EntitySet.name).toEqual('Products');
     });
 
+    it('should get schema with default namespace', async () => {
+        const schema = await context.getMetadata();
+        expect(schema.Namespace).toEqual('App');
+        const entityType = schema.EntityType.find((x) => x.Name === 'Product');
+        expect(entityType).toBeTruthy();
+        expect(entityType.BaseType).toEqual('Thing');
+        expect(entityType.BaseTypeName.Name).toEqual('Thing');
+        expect(entityType.BaseTypeName.FullyQualifiedName).toEqual('App.Thing');
+    });
+
+    it('should parse type with namespace', () => {
+        expect(EdmSchema.hasNameWithNamespace('App')).toBeFalsy();
+        let actual1 = EdmSchema.hasNameWithNamespace('App.Thing');
+        expect(actual1).toBeTruthy();
+        expect(actual1.Name).toEqual('Thing');
+        expect(actual1.FullyQualifiedName).toEqual('App.Thing');
+        expect(EdmSchema.hasNameWithNamespace('Thing')).toBeFalsy();
+        expect(EdmSchema.hasNameWithNamespace('Edm.String')).toBeFalsy();
+        expect(EdmSchema.hasNameWithNamespace('Collection(Edm.String)')).toBeFalsy();
+        let actual = EdmSchema.hasNameWithNamespace('Collection(App.Thing)');
+        expect(actual).toBeTruthy();
+        expect(actual.Name).toEqual('Collection(Thing)');
+        expect(actual.FullyQualifiedName).toEqual('Collection(App.Thing)');
+        expect(EdmSchema.hasNameWithNamespace('Collection(Thing)')).toBeFalsy();
+    });
+
+    it('should get entity set with default namespace', async () => {
+        const schema = await context.getMetadata();
+        expect(schema.Namespace).toEqual('App');
+        const entitySet = schema.EntityContainer.EntitySet.find((x) => x.EntityType === 'Product');
+        expect(entitySet).toBeTruthy();
+        expect(entitySet.Name).toEqual('Products');
+        expect(entitySet.EntityTypeName.Name).toEqual('Product');
+        expect(entitySet.EntityTypeName.FullyQualifiedName).toEqual('App.Product');
+    });
+
+    it('should get property with default namespace', async () => {
+        const schema = await context.getMetadata();
+        const entityType = schema.EntityType.find((x) => x.Name === 'Person');
+        const property = entityType.NavigationProperty.find((x) => x.Name === 'workLocation');
+        expect(property).toBeTruthy();
+        expect(property.Type).toEqual('Place');
+        expect(property.TypeName.Name).toEqual('Place');
+        expect(property.TypeName.FullyQualifiedName).toEqual('App.Place');
+    });
+
+    it('should get parameter with default namespace', async () => {
+        const schema = await context.getMetadata();
+        const func = schema.Function.find((x) => x.Name === 'Me');
+        const parameter = func.Parameter.find((x) => x.Name === 'bindingParameter');
+        expect(parameter).toBeTruthy();
+        expect(parameter.Type).toEqual('Collection(Account)');
+        expect(parameter.TypeName.Name).toEqual('Collection(Account)');
+        expect(parameter.TypeName.FullyQualifiedName).toEqual('Collection(App.Account)');
+        expect(func.ReturnType.TypeName).toBeTruthy();
+        expect(func.ReturnType.Type).toEqual('User')
+        expect(func.ReturnType.TypeName.Name).toEqual('User');
+        expect(func.ReturnType.TypeName.FullyQualifiedName).toEqual('App.User');
+    });
+
+    it('should get collection property with default namespace', async () => {
+        const schema = await context.getMetadata();
+        const entityType = schema.EntityType.find((x) => x.Name === 'Person');
+        const property = entityType.NavigationProperty.find((x) => x.Name === 'colleagues');
+        expect(property).toBeTruthy();
+        expect(property.Type).toEqual('Collection(Person)');
+        expect(property.TypeName.Name).toEqual('Collection(Person)');
+        expect(property.TypeName.FullyQualifiedName).toEqual('Collection(App.Person)');
+    });
+
     it('should define entity type annotation', () => {
         const annotation = Order as unknown as {
             Entity: {
