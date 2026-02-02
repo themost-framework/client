@@ -67,7 +67,7 @@ describe('EdmSchema', () => {
         expect(entityType).toBeTruthy();
         expect(entityType.BaseType).toEqual('Thing');
         expect(entityType.BaseTypeName.Name).toEqual('Thing');
-        expect(entityType.BaseTypeName.FullyQualifiedName).toEqual('App.Thing');
+        expect(entityType.BaseTypeName.QualifiedName).toEqual('App.Thing');
     });
 
     it('should parse type with namespace', () => {
@@ -75,14 +75,14 @@ describe('EdmSchema', () => {
         let actual1 = EdmSchema.hasNameWithNamespace('App.Thing');
         expect(actual1).toBeTruthy();
         expect(actual1.Name).toEqual('Thing');
-        expect(actual1.FullyQualifiedName).toEqual('App.Thing');
+        expect(actual1.QualifiedName).toEqual('App.Thing');
         expect(EdmSchema.hasNameWithNamespace('Thing')).toBeFalsy();
         expect(EdmSchema.hasNameWithNamespace('Edm.String')).toBeFalsy();
         expect(EdmSchema.hasNameWithNamespace('Collection(Edm.String)')).toBeFalsy();
         let actual = EdmSchema.hasNameWithNamespace('Collection(App.Thing)');
         expect(actual).toBeTruthy();
         expect(actual.Name).toEqual('Collection(Thing)');
-        expect(actual.FullyQualifiedName).toEqual('Collection(App.Thing)');
+        expect(actual.QualifiedName).toEqual('Collection(App.Thing)');
         expect(EdmSchema.hasNameWithNamespace('Collection(Thing)')).toBeFalsy();
     });
 
@@ -93,7 +93,8 @@ describe('EdmSchema', () => {
         expect(entitySet).toBeTruthy();
         expect(entitySet.Name).toEqual('Products');
         expect(entitySet.EntityTypeName.Name).toEqual('Product');
-        expect(entitySet.EntityTypeName.FullyQualifiedName).toEqual('App.Product');
+        expect(entitySet.EntityTypeName.Namespace).toEqual('App');
+        expect(entitySet.EntityTypeName.QualifiedName).toEqual('App.Product');
     });
 
     it('should get property with default namespace', async () => {
@@ -103,7 +104,7 @@ describe('EdmSchema', () => {
         expect(property).toBeTruthy();
         expect(property.Type).toEqual('Place');
         expect(property.TypeName.Name).toEqual('Place');
-        expect(property.TypeName.FullyQualifiedName).toEqual('App.Place');
+        expect(property.TypeName.QualifiedName).toEqual('App.Place');
     });
 
     it('should get parameter with default namespace', async () => {
@@ -113,11 +114,11 @@ describe('EdmSchema', () => {
         expect(parameter).toBeTruthy();
         expect(parameter.Type).toEqual('Collection(Account)');
         expect(parameter.TypeName.Name).toEqual('Collection(Account)');
-        expect(parameter.TypeName.FullyQualifiedName).toEqual('Collection(App.Account)');
+        expect(parameter.TypeName.QualifiedName).toEqual('Collection(App.Account)');
         expect(func.ReturnType.TypeName).toBeTruthy();
         expect(func.ReturnType.Type).toEqual('User')
         expect(func.ReturnType.TypeName.Name).toEqual('User');
-        expect(func.ReturnType.TypeName.FullyQualifiedName).toEqual('App.User');
+        expect(func.ReturnType.TypeName.QualifiedName).toEqual('App.User');
     });
 
     it('should get collection property with default namespace', async () => {
@@ -127,7 +128,7 @@ describe('EdmSchema', () => {
         expect(property).toBeTruthy();
         expect(property.Type).toEqual('Collection(Person)');
         expect(property.TypeName.Name).toEqual('Collection(Person)');
-        expect(property.TypeName.FullyQualifiedName).toEqual('Collection(App.Person)');
+        expect(property.TypeName.QualifiedName).toEqual('Collection(App.Person)');
     });
 
     it('should define entity type annotation', () => {

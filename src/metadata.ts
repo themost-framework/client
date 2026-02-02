@@ -14,9 +14,10 @@ export declare interface EntitySetAnnotation {
     }
 }
 
-export declare  interface NameWithNamespace {
+export declare  interface FullQualifiedName {
     Name: string;
-    FullyQualifiedName: string;
+    Namespace?: string;
+    QualifiedName: string;
 }
 
 /**
@@ -45,7 +46,7 @@ export class EdmSchema {
         return null;
     }
 
-    public static hasNameWithNamespace(typeName: string): NameWithNamespace {
+    public static hasNameWithNamespace(typeName: string): FullQualifiedName {
         if (typeName == null) {
             return null;
         }
@@ -59,9 +60,12 @@ export class EdmSchema {
             // check for type name with namespace
             const collectionNameWithNamespace = EdmSchema.hasNameWithNamespace(collectionTypeName);
             if (collectionNameWithNamespace) {
+                const collectionParts = collectionTypeName.split('.');
+                collectionParts.pop();
                 return {
                     Name: `Collection(${collectionNameWithNamespace.Name})`,
-                    FullyQualifiedName: `Collection(${collectionNameWithNamespace.FullyQualifiedName})`
+                    Namespace: collectionParts.join('.'),
+                    QualifiedName: `Collection(${collectionNameWithNamespace.QualifiedName})`
                 };
             }
             return null;
@@ -69,8 +73,9 @@ export class EdmSchema {
         const parts = typeName.split('.');
         if (parts.length > 1) {
             return {
-                Name: parts[parts.length - 1],
-                FullyQualifiedName: typeName
+                Name: parts.pop(),
+                Namespace: parts.join('.'),
+                QualifiedName: typeName
             };
         }
         return null;
@@ -176,7 +181,7 @@ export class EdmAction extends EdmProcedure {
 export class EdmParameter {
     public Name: string;
     public Type: string;
-    public TypeName?: NameWithNamespace;
+    public TypeName?: FullQualifiedName;
     public Nullable = true;
     public readXml(node: XNode) {
         this.Name = node.getAttribute('Name');
@@ -194,7 +199,7 @@ export class EdmParameter {
  */
 export class EdmReturnType {
     public Type: string;
-    public TypeName?: NameWithNamespace;
+    public TypeName?: FullQualifiedName;
     public Nullable = true;
     public readXml(node: XNode) {
         this.Type = node.getAttribute('Type');
@@ -212,7 +217,7 @@ export class EdmReturnType {
 export class EdmProperty {
     public Name: string;
     public Type: string;
-    public TypeName?: NameWithNamespace;
+    public TypeName?: FullQualifiedName;
     public Nullable = true;
     public Immutable = false;
     public Description: string;
@@ -259,7 +264,7 @@ export class EdmProperty {
 export class EdmNavigationProperty {
     public Name: string;
     public Type: string;
-    public TypeName?: NameWithNamespace;
+    public TypeName?: FullQualifiedName;
     public Immutable = false;
     public Description: string;
     public LongDescription: string;
@@ -323,7 +328,7 @@ export class EdmPropertyRef {
 export class EdmEntityType {
     public Name: string;
     public BaseType: string;
-    public BaseTypeName?: NameWithNamespace;
+    public BaseTypeName?: FullQualifiedName;
     public OpenType: boolean;
     public Key: EdmKey;
     public Property: EdmProperty[] = [];
@@ -367,7 +372,7 @@ export class EdmEntityType {
 export class EdmEntitySet {
     public Name: string;
     public EntityType: string;
-    public EntityTypeName?: NameWithNamespace;
+    public EntityTypeName?: FullQualifiedName;
     public ResourcePath: string;
     constructor() {
         //
